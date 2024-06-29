@@ -1,8 +1,13 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { NestFactory, NestApplication } from '@nestjs/core';
+import { AppModule } from './app/app.module';
+import buildAppiDocs from './docs/swagger.builder';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+async function bootstrap(): Promise<void> {
+  const app: NestApplication = await NestFactory.create(AppModule);
+
+  buildAppiDocs<NestApplication>(app);
+
+  await app.listen(process.env.APP_PORT);
 }
+
 bootstrap();
