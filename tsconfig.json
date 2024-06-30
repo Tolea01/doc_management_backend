@@ -18,12 +18,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "app/*": ["./src/app"],
-      "src/*": ["./src"],
-      "config/*": ["./src/config"],
-      "database/*": ["./src/database"],
-      "docs/*": ["./src/docs"],
-      "modules/*": ["./src/app/modules"]
+      "app/*": ["./src/app/*"],
+      "src/*": ["./src/*"],
+      "config/*": ["./src/config/*"],
+      "database/*": ["./src/database/*"],
+      "docs/*": ["./src/docs/*"],
+      "modules/*": ["./src/app/modules/*"]
     }
   }
 }
