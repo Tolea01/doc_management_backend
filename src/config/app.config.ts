@@ -8,9 +8,10 @@ export default class AppConfig {
 
   public static getCorsOptions(): CorsOptions {
     return {
-      origin: ['http://localhost:3000'],
+      origin: [process.env.CORS_ALLOWED_ORIGINS],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
     };
   }
 }
