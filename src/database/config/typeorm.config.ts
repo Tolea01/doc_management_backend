@@ -1,16 +1,18 @@
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import dbConnectionOptions from './db.connection.config';
 
-export default TypeOrmModule.forRootAsync({
-  imports: [ConfigModule],
-  inject: [ConfigService],
-  useFactory: (configService: ConfigService) => ({
-    type: 'postgres',
-    host: configService.get('DB_HOST'),
-    port: +configService.get('DB_PORT'),
-    username: configService.get('DB_USERNAME'),
-    password: configService.get('DB_PASSWORD'),
-    database: configService.get('DB'),
-    synchronize: true,
-  }),
+const AppDataSource: DataSource = new DataSource({
+  ...dbConnectionOptions,
+  entities: ['dist/**/*.entity{.ts,.js}'],
+  migrations: ['dist/migrations/*.js'],
 });
+
+AppDataSource.initialize()
+  .then(() => {
+    console.log('Data Source has been initialized!');
+  })
+  .catch((err) => {
+    console.error('Error during Data Source initialization', err);
+  });
+
+export default AppDataSource;

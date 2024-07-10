@@ -1,5 +1,7 @@
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import dbConnectionOptions from 'src/database/config/db.connection.config';
 
 export default class AppConfig {
   public static setupConfigModule(): ReturnType<typeof ConfigModule.forRoot> {
@@ -12,6 +14,14 @@ export default class AppConfig {
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
       allowedHeaders: ['Content-Type', 'Authorization'],
       credentials: true,
+    };
+  }
+
+  public static databaseConnection(): TypeOrmModuleOptions {
+    return {
+      ...dbConnectionOptions,
+      autoLoadEntities: true,
+      entities: ['src/**/*.entity.{.ts, .js}'],
     };
   }
 }
