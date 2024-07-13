@@ -19,7 +19,6 @@ export class User {
   surname: string;
 
   @Column({
-    length: 64,
     nullable: false,
   })
   password: string;
@@ -31,6 +30,7 @@ export class User {
   role: UserRole;
 
   @Column({
+    nullable: true,
     length: 255,
   })
   photo: string;

@@ -37,7 +37,7 @@ export class CreateUserDto {
   @IsNotEmpty()
   role: UserRole;
 
-  @ApiProperty({ example: 'photo', description: 'photo' })
+  @ApiProperty({ required: false, example: 'photo', description: 'photo' })
   @IsString()
   @IsOptional()
   photo: string;
