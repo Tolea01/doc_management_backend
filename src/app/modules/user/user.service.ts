@@ -12,7 +12,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserItemDto } from './dto/user-item.dto';
 import * as argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
-import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
+import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { UserSort } from './validators/user.sort.validator';
 import { UserFilterBuilder } from './builders/user.filter.builder';
 import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';

@@ -15,11 +15,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserItemDto } from './dto/user-item.dto';
-import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
-import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
+import ParamApiOperation from 'common/decorators/swagger/param.api.operation';
+import QueryApiOperation from 'common/decorators/swagger/query.api.operation';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import paginationConfig from 'src/config/pagination.config';
-import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
+import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { UserSort } from './validators/user.sort.validator';
 
 @ApiTags('Users')

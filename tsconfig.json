@@ -23,7 +23,8 @@
       "config/*": ["./src/config/*"],
       "database/*": ["./src/database/*"],
       "docs/*": ["./src/docs/*"],
-      "modules/*": ["./src/app/modules/*"]
+      "modules/*": ["./src/app/modules/*"],
+      "common/*": ["./src/app/common/*"],
     }
   }
 }
