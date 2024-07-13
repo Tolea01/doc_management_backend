@@ -21,7 +21,7 @@ export default class AppConfig {
     return {
       ...dbConnectionOptions,
       autoLoadEntities: true,
-      entities: ['src/**/*.entity.{.ts, .js}'],
+      entities: ['dist/app/modules/**/*.entity{.ts,.js}'],
     };
   }
 }
