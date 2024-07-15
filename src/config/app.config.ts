@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import dbConnectionOptions from 'src/database/config/db.connection.config';
 import { config as dotenvConfig } from 'dotenv';
-import path from 'path';
+import * as path from 'path';
 import {
   AcceptLanguageResolver,
   HeaderResolver,
