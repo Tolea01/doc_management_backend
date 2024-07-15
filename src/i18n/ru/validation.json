@@ -6,5 +6,6 @@
   "INVALID_NUMBER": "{property} должно быть допустимым числом",
   "MAX": "{property} с значением: \"{value}\" должно быть меньше, чем {constraints.0}",
   "INVALID_DATE_STRING": "{property} должно быть допустимой строкой даты",
-  "INVALID_PROPERTY": "{property} недействительный"
+  "INVALID_PROPERTY": "{property} недействительный",
+  "INVALID_EMAIL": "{property} должно быть действительным email"
 }

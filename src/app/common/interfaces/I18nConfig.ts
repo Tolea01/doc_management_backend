@@ -1,4 +1,7 @@
-import { Resolver } from 'nestjs-i18n/dist/interfaces/resolver.interface';
+export interface Resolver {
+  use: any;
+  options: string[];
+}
 
 export default interface I18nConfig {
   fallbackLanguage: string;
