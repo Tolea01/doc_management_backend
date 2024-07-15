@@ -1,0 +1,10 @@
+{
+  "NOT_EMPTY": "{property} не может быть пустым",
+  "MIN_MAX": "{property} должно содержать от {constraints.0} до {constraints.1} символов",
+  "INVALID_STRING": "{property} должно быть строкой",
+  "INVALID_USER_ENUM": "{property} должно быть одним из [Admin, Director, Secretary, HeadOfDirection]",
+  "INVALID_NUMBER": "{property} должно быть допустимым числом",
+  "MAX": "{property} с значением: \"{value}\" должно быть меньше, чем {constraints.0}",
+  "INVALID_DATE_STRING": "{property} должно быть допустимой строкой даты",
+  "INVALID_PROPERTY": "{property} недействительный"
+}

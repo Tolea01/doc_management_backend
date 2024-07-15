@@ -1,18 +1,24 @@
-import { NestFactory, NestApplication } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
+import { INestApplication } from '@nestjs/common';
 import { AppModule } from './app/app.module';
 import buildAppiDocs from './docs/swagger.builder';
 import AppConfig from './config/app.config';
-import { ValidationPipe } from '@nestjs/common';
+import { config as dotenvConfig } from 'dotenv';
+import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+
+dotenvConfig();
 
 async function bootstrap(): Promise<void> {
-  const app: NestApplication = await NestFactory.create(AppModule);
+  const app: INestApplication<any> = await NestFactory.create(AppModule);
 
-  app.enableCors(AppConfig.getCorsOptions());
-  app.useGlobalPipes(new ValidationPipe());
+  app
+    .useGlobalPipes(new I18nValidationPipe())
+    .useGlobalFilters(new I18nValidationExceptionFilter())
+    .enableCors(AppConfig.getCorsOptions());
 
-  buildAppiDocs<NestApplication>(app);
+  buildAppiDocs(app);
 
-  await app.listen(process.env.APP_PORT);
+  await app.listen(process.env.APP_PORT || 3000);
 }
 
 bootstrap();
