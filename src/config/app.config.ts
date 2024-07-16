@@ -38,7 +38,7 @@ export default class AppConfig {
     return {
       fallbackLanguage: process.env.DEFAULT_APP_LANGUAGE || 'ro',
       loaderOptions: {
-        path: path.join(__dirname, '../..', '/i18n'),
+        path: path.join(__dirname, '../i18n'),
         watch: true,
       },
       resolvers: [
