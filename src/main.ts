@@ -12,6 +12,7 @@ async function bootstrap(): Promise<void> {
   const app: INestApplication<any> = await NestFactory.create(AppModule);
 
   app
+    .setGlobalPrefix('api')
     .useGlobalPipes(new I18nValidationPipe())
     .useGlobalFilters(new I18nValidationExceptionFilter())
     .enableCors(AppConfig.getCorsOptions());
