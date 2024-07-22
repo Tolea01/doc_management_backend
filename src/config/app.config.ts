@@ -9,6 +9,8 @@ import {
   HeaderResolver,
   QueryResolver,
 } from 'nestjs-i18n';
+import { JwtModuleOptions } from '@nestjs/jwt';
+import I18nConfig from 'app/common/interfaces/I18nConfig';
 
 dotenvConfig();
 
@@ -34,7 +36,7 @@ export default class AppConfig {
     };
   }
 
-  public static getI18nConfig() {
+  public static getI18nConfig(): I18nConfig {
     return {
       fallbackLanguage: process.env.DEFAULT_APP_LANGUAGE || 'ro',
       loaderOptions: {
@@ -46,6 +48,13 @@ export default class AppConfig {
         { use: HeaderResolver, options: ['language'] },
         { use: AcceptLanguageResolver, options: [] },
       ],
+    };
+  }
+
+  public static getJwtConfig(): JwtModuleOptions {
+    return {
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIRE },
     };
   }
 }
