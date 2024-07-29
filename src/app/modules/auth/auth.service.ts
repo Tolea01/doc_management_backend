@@ -6,7 +6,6 @@ import { UserRegisterResponseDto } from './dto/user-register.response.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
 import { verify } from 'argon2';
-// import { UserItemDto } from '../user/dto/user-item.dto';
 import { User } from '../user/entities/user.entity';
 
 @Injectable()
@@ -23,21 +22,16 @@ export class AuthService {
   }
 
   async login(userData: UserLoginPayloadDto): Promise<UserLoginResponseDto> {
-    let validCredentials: boolean = false;
-
     try {
       const existingUser: User | undefined =
         await this.userService.findOneByEmail(userData.email_address);
-      const passwordMatch: boolean = await verify(
-        userData.password,
+
+      const verifyUserDataPassword: boolean = await verify(
         existingUser.password,
+        userData.password,
       );
 
-      if (existingUser && passwordMatch) {
-        validCredentials = true;
-      }
-
-      if (validCredentials) {
+      if (verifyUserDataPassword) {
         return {
           token: this.jwtService.sign({
             props: {
@@ -47,8 +41,11 @@ export class AuthService {
               email: existingUser.email_address,
               role: existingUser.role,
             },
+            sub: existingUser.id,
           }),
         };
+      } else {
+        throw new UnauthorizedException();
       }
     } catch (error) {
       throw new UnauthorizedException(`Invalid credentials. ${error.message}`);

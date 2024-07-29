@@ -1,27 +1,48 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserRegisterPayloadDto } from './dto/user.register.payload.dto';
 import { UserRegisterResponseDto } from './dto/user-register.response.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
+import { Role } from 'app/common/decorators/auth/roles.decorator';
+import { UserRole } from '../user/roles/role.enum';
+import { PublicRoute } from 'app/common/decorators/auth/public-route.decorator';
 
-@ApiBearerAuth()
 @ApiTags('Authentification')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: 'Register a new user' })
   @Post('register')
+  @Role(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully registered',
+  })
   async registerUser(
     @Body() userData: UserRegisterPayloadDto,
   ): Promise<UserRegisterResponseDto> {
     return this.authService.registerUser(userData);
   }
 
-  @ApiOperation({ summary: 'Login user' })
   @Post('login')
+  @PublicRoute()
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Login user' })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'User is not registered' })
+  @ApiResponse({ status: 500, description: 'Server error' })
   async login(
     @Body() userData: UserLoginPayloadDto,
   ): Promise<UserLoginResponseDto> {
