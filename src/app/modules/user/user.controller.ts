@@ -37,7 +37,10 @@ export class UserController {
 
   @Post('register')
   @Role(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Create a new user' })
+  @ApiOperation({
+    summary: 'Create a new user',
+    description: 'Requires ADMIN role to create a new user',
+  })
   @ApiResponse({
     status: 201,
     description: 'The user has been successfully created',
@@ -51,6 +54,10 @@ export class UserController {
 
   @Get('list')
   @Role(UserRole.ALL)
+  @ApiOperation({
+    summary: 'Get a list of users',
+    description: 'Accessible by ALL users',
+  })
   @ParamApiOperation('user')
   @QueryApiOperation('limit', 'number', 'items per page')
   @QueryApiOperation('page', 'number', 'page number')
@@ -78,7 +85,10 @@ export class UserController {
 
   @Get(':id')
   @Role(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Get user by id' })
+  @ApiOperation({
+    summary: 'Get user by id',
+    description: 'Requires ADMIN role to get a user by ID',
+  })
   @ApiResponse({ status: 200, description: 'User has been found' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
@@ -90,6 +100,10 @@ export class UserController {
 
   @Patch(':id')
   @Role(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Update user by id',
+    description: 'Requires ADMIN role to update a user by ID',
+  })
   @ApiOperation({ summary: 'Update user by id' })
   @ApiResponse({ status: 200, description: 'User has been updated' })
   @ApiResponse({ status: 400, description: 'Validation error' })
@@ -103,6 +117,10 @@ export class UserController {
 
   @Delete(':id')
   @Role(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Delete user by id',
+    description: 'Requires ADMIN role to delete a user by ID',
+  })
   @ApiOperation({ summary: 'Delete user by id' })
   @ApiResponse({ status: 200, description: 'User has been deleted' })
   @ApiResponse({ status: 500, description: 'Server error' })

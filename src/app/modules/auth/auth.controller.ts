@@ -21,6 +21,10 @@ export class AuthController {
 
   @Post('register')
   @Role(UserRole.ADMIN)
+  @ApiOperation({
+    summary: 'Create a new user',
+    description: 'Requires ADMIN role to create a new user',
+  })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Register a new user' })
   @ApiResponse({ status: 400, description: 'Bad request' })
@@ -39,7 +43,10 @@ export class AuthController {
   @Post('login')
   @PublicRoute()
   @HttpCode(200)
-  @ApiOperation({ summary: 'Login user' })
+  @ApiOperation({
+    summary: 'Login user',
+    description: 'This is a public route',
+  })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'User is not registered' })
   @ApiResponse({ status: 500, description: 'Server error' })
