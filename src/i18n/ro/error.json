@@ -1,0 +1,12 @@
+{
+  "unauthorized": "Acces neautorizat.",
+  "invalid_credentials": "Date de logare invalide",
+  "user_already_exists": "Utilizatorul cu emailul {email} există deja",
+  "registration_failed": "Înregistrarea utilizatorului a eșuat. {error}",
+  "fetch_users_failed": "Eșec la obținerea utilizatorilor. {error}",
+  "user_not_found": "Utilizatorul cu id {id} nu a fost găsit. {error}",
+  "user_email_not_found": "Utilizatorul cu adresa de email {email} nu a fost găsit. {error}",
+  "password_updated": "Parola a fost actualizată cu succes",
+  "update_failed": "Eșec la actualizarea utilizatorului cu id {id}. {error}",
+  "delete_failed": "Eșec la ștergerea utilizatorului cu id {id}. {error}"
+}

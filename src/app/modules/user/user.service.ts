@@ -16,11 +16,14 @@ import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { UserSort } from './validators/user.sort.validator';
 import { UserFilterBuilder } from './builders/user.filter.builder';
 import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { I18nService } from 'nestjs-i18n';
+import { translateMessage } from 'app/utils/translateMessage';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly i18n: I18nService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserItemDto> {
@@ -31,7 +34,9 @@ export class UserService {
 
       if (existUser) {
         throw new ConflictException(
-          `User with email ${createUserDto.email_address} already exists`,
+          await translateMessage(this.i18n, 'error.user_already_exists', {
+            email: existUser.email_address,
+          }),
         );
       }
 
@@ -43,7 +48,9 @@ export class UserService {
       return plainToInstance(UserItemDto, user);
     } catch (error) {
       throw new InternalServerErrorException(
-        `Failed to register user. ${error.message}`,
+        await translateMessage(this.i18n, 'error.registration_failed', {
+          error: error.message,
+        }),
       );
     }
   }
@@ -75,7 +82,9 @@ export class UserService {
       };
     } catch (error) {
       throw new InternalServerErrorException(
-        `Failed to fetch users. ${error.message}`,
+        await translateMessage(this.i18n, 'error.fetch_users_failed', {
+          error: error.message,
+        }),
       );
     }
   }
@@ -89,7 +98,10 @@ export class UserService {
       return plainToInstance(UserItemDto, user);
     } catch (error) {
       throw new NotFoundException(
-        `User with id ${id} not found. ${error.message}`,
+        await translateMessage(this.i18n, 'error.user_not_found', {
+          id,
+          error: error.message,
+        }),
       );
     }
   }
@@ -103,7 +115,10 @@ export class UserService {
       return user;
     } catch (error) {
       throw new NotFoundException(
-        `User with id ${email} not found. ${error.message}`,
+        await translateMessage(this.i18n, 'error.user_not_found', {
+          email,
+          error: error.message,
+        }),
       );
     }
   }
@@ -129,7 +144,10 @@ export class UserService {
       };
     } catch (error) {
       throw new InternalServerErrorException(
-        `Failed to update user with id ${id}. ${error.message}`,
+        await translateMessage(this.i18n, 'error.update_failed', {
+          id,
+          error: error.message,
+        }),
       );
     }
   }
@@ -139,7 +157,10 @@ export class UserService {
       await this.userRepository.delete(id);
     } catch (error) {
       throw new InternalServerErrorException(
-        `Failed to delete user with id ${id}. ${error.message}`,
+        await translateMessage(this.i18n, 'error.delete_failed', {
+          id,
+          error: error.message,
+        }),
       );
     }
   }

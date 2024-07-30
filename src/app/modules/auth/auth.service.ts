@@ -7,12 +7,15 @@ import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
 import { verify } from 'argon2';
 import { User } from '../user/entities/user.entity';
+import { I18nService } from 'nestjs-i18n';
+import { translateMessage } from 'app/utils/translateMessage';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly i18n: I18nService,
   ) {}
 
   async registerUser(
@@ -45,10 +48,14 @@ export class AuthService {
           }),
         };
       } else {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException(
+          await translateMessage(this.i18n, 'error.invalid_credentials'),
+        );
       }
     } catch (error) {
-      throw new UnauthorizedException(`Invalid credentials. ${error.message}`);
+      throw new UnauthorizedException(
+        await translateMessage(this.i18n, 'error.invalid_credentials'),
+      );
     }
   }
 }

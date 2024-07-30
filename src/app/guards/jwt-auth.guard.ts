@@ -1,11 +1,20 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { PUBLIC_ROUTE_KEY } from 'app/common/decorators/auth/public-route.decorator';
+import { I18nService } from 'nestjs-i18n';
+import { translateMessage } from 'app/utils/translateMessage';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private readonly reflector: Reflector) {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly i18n: I18nService,
+  ) {
     super();
   }
 
@@ -19,6 +28,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
 
-    return super.canActivate(context) as Promise<boolean>;
+    try {
+      await super.canActivate(context);
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException(
+        await translateMessage(this.i18n, 'error.unauthorized'),
+      );
+    }
   }
 }
