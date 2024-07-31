@@ -10,7 +10,7 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import { JwtModuleOptions } from '@nestjs/jwt';
-import I18nConfig from 'app/common/interfaces/I18nConfig';
+import I18nConfig from 'app/common/interfaces/I18nConfig.interface';
 
 dotenvConfig();
 

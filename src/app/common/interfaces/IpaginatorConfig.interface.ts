@@ -1,4 +1,4 @@
-export default interface IpaginatorConfig {
+export default interface IPaginatorConfig {
   page: number;
   limit: number;
   sortOrder: string;

@@ -1,4 +1,4 @@
-import IpaginatorConfig from 'app/common/interfaces/IpaginatorConfig';
+import IpaginatorConfig from 'app/common/interfaces/IpaginatorConfig.interface';
 
 const paginationConfig: IpaginatorConfig = {
   page: 1,
