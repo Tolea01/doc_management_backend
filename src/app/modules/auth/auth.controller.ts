@@ -13,8 +13,10 @@ import { UserLoginResponseDto } from './dto/user-login.response.dto';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
 import { UserRole } from '../user/roles/role.enum';
 import { PublicRoute } from 'app/common/decorators/auth/public-route.decorator';
+import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 
 @ApiTags('Authentification')
+@ApiLanguageHeader()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

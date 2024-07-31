@@ -28,8 +28,10 @@ import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { UserSort } from './validators/user.sort.validator';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
 import { UserRole } from './roles/role.enum';
+import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 
 @ApiTags('Users')
+@ApiLanguageHeader()
 @ApiBearerAuth()
 @Controller('user')
 export class UserController {

@@ -1,5 +1,5 @@
 {
-  "unauthorized": "Неавторизованный доступ. {error}",
+  "unauthorized": "Неавторизованный доступ.",
   "invalid_credentials": "Неверные учетные данные",
   "user_already_exists": "Пользователь с электронной почтой {email} уже существует",
   "registration_failed": "Регистрация пользователя не удалась. {error}",
