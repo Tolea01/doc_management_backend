@@ -8,5 +8,6 @@
   "user_email_not_found": "Пользователь с электронной почтой {email} не найден. {error}",
   "password_updated": "Пароль успешно обновлен",
   "update_failed": "Не удалось обновить пользователя с ID {id}. {error}",
-  "delete_failed": "Не удалось удалить пользователя с ID {id}. {error}"
+  "delete_failed": "Не удалось удалить пользователя с ID {id}. {error}",
+  "token_generation_failed": "Ошибка генерации токенов."
 }

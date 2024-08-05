@@ -1,7 +1,6 @@
 import { UserRole } from 'app/modules/user/roles/role.enum';
 
 export interface IJwtUserPayload {
-  token: string;
   props: {
     id: number;
     name: string;

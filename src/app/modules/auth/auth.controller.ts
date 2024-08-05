@@ -57,4 +57,21 @@ export class AuthController {
   ): Promise<UserLoginResponseDto> {
     return this.authService.login(userData);
   }
+
+  @Post('refresh-tokens')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Generate new tokens',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Tokens have been successfully generated',
+  })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  async refreshTokens(
+    @Body() oldRefreshToken: string,
+  ): Promise<UserLoginResponseDto> {
+    return this.refreshTokens(oldRefreshToken);
+  }
 }

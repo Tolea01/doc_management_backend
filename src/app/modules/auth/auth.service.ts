@@ -9,6 +9,10 @@ import { verify } from 'argon2';
 import { User } from '../user/entities/user.entity';
 import { I18nService } from 'nestjs-i18n';
 import { translateMessage } from 'app/utils/translateMessage';
+import { ConfigService } from '@nestjs/config';
+import { UserItemDto } from '../user/dto/user-item.dto';
+import { IJwtUserPayload } from 'app/common/interfaces/jwt-user-payload.interface';
+import { TokenResponseDto } from './dto/tokens.response.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +20,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
+    private readonly configService: ConfigService,
   ) {}
 
   async registerUser(
@@ -29,24 +34,24 @@ export class AuthService {
       const existingUser: User | undefined =
         await this.userService.findOneByEmail(userData.email_address);
 
+      const jwtPayload: IJwtUserPayload = {
+        props: {
+          id: existingUser.id,
+          name: existingUser.name,
+          surname: existingUser.surname,
+          email: existingUser.email_address,
+          role: existingUser.role,
+        },
+        sub: existingUser.id,
+      };
+
       const verifyUserDataPassword: boolean = await verify(
         existingUser.password,
         userData.password,
       );
 
       if (verifyUserDataPassword) {
-        return {
-          token: this.jwtService.sign({
-            props: {
-              id: existingUser.id,
-              name: existingUser.name,
-              surname: existingUser.surname,
-              email: existingUser.email_address,
-              role: existingUser.role,
-            },
-            sub: existingUser.id,
-          }),
-        };
+        return this.generateTokens(jwtPayload);
       } else {
         throw new UnauthorizedException(
           await translateMessage(this.i18n, 'error.invalid_credentials'),
@@ -55,6 +60,43 @@ export class AuthService {
     } catch (error) {
       throw new UnauthorizedException(
         await translateMessage(this.i18n, 'error.invalid_credentials'),
+      );
+    }
+  }
+
+  async generateTokens(payload: IJwtUserPayload): Promise<TokenResponseDto> {
+    const refreshToken = await this.jwtService.signAsync(payload);
+    const accesToken = await this.jwtService.signAsync(payload, {
+      expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
+      secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
+    });
+
+    return { accesToken, refreshToken };
+  }
+
+  async refreshTokens(oldRefreshToken: string): Promise<TokenResponseDto> {
+    try {
+      const decodedUser: any = await this.jwtService.verifyAsync(
+        oldRefreshToken,
+        {
+          secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
+        },
+      );
+
+      const user: UserItemDto | undefined = await this.userService.findOne(
+        decodedUser.sub,
+      );
+
+      if (!user) {
+        throw new UnauthorizedException(
+          await translateMessage(this.i18n, 'error.token_generation_failed'),
+        );
+      }
+
+      return this.generateTokens(decodedUser);
+    } catch (error) {
+      throw new UnauthorizedException(
+        await translateMessage(this.i18n, 'error.token_generation_failed'),
       );
     }
   }

@@ -8,5 +8,6 @@
   "user_email_not_found": "Utilizatorul cu adresa de email {email} nu a fost găsit. {error}",
   "password_updated": "Parola a fost actualizată cu succes",
   "update_failed": "Eșec la actualizarea utilizatorului cu id {id}. {error}",
-  "delete_failed": "Eșec la ștergerea utilizatorului cu id {id}. {error}"
+  "delete_failed": "Eșec la ștergerea utilizatorului cu id {id}. {error}",
+  "token_generation_failed": "Generarea token-urilor a eșuat."
 }
