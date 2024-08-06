@@ -1,9 +1,8 @@
 import { DataSource } from 'typeorm';
 import dbConnectionOptions from './db.connection.config';
-import { ConfigService } from '@nestjs/config';
 
 const AppDataSource: DataSource = new DataSource({
-  ...dbConnectionOptions(new ConfigService()),
+  ...dbConnectionOptions,
   entities: ['dist/app/modules/**/*.entity{.ts,.js}'],
   migrations: ['dist/database/migrations/*.js'],
 });

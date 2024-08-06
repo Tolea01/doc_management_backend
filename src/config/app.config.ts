@@ -22,7 +22,7 @@ export default class AppConfig {
 
   public databaseConnection(): TypeOrmModuleOptions {
     return {
-      ...dbConnectionOptions(this.configService),
+      ...dbConnectionOptions,
       autoLoadEntities: true,
       entities: ['dist/app/modules/**/*.entity{.ts,.js}'],
     };

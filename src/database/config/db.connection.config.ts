@@ -1,16 +1,16 @@
-import { ConfigService } from '@nestjs/config';
+import { config as dotenvConfig } from 'dotenv';
 import { DataSourceOptions } from 'typeorm';
 
-export const dbConnectionOptions = (
-  configService: ConfigService,
-): DataSourceOptions => ({
+dotenvConfig();
+
+const dbConnectionOptions: DataSourceOptions = {
   type: 'postgres',
-  host: configService.get<string>('DB_HOST'),
-  port: Number(configService.get<number>('DB_PORT')),
-  username: configService.get<string>('DB_USERNAME'),
-  password: configService.get<string>('DB_PASSWORD'),
-  database: configService.get<string>('DB_NAME'),
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT, 10),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   synchronize: false,
-});
+};
 
 export default dbConnectionOptions;
