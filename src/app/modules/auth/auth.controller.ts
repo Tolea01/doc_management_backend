@@ -14,6 +14,7 @@ import { Role } from 'app/common/decorators/auth/roles.decorator';
 import { UserRole } from '../user/roles/role.enum';
 import { PublicRoute } from 'app/common/decorators/auth/public-route.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @ApiTags('Authentification')
 @ApiLanguageHeader()
@@ -59,6 +60,7 @@ export class AuthController {
   }
 
   @Post('refresh-tokens')
+  @Role(UserRole.ALL)
   @HttpCode(200)
   @ApiOperation({
     summary: 'Generate new tokens',
@@ -70,8 +72,8 @@ export class AuthController {
   @ApiResponse({ status: 500, description: 'Server error' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async refreshTokens(
-    @Body() oldRefreshToken: string,
+    @Body() oldRefreshTokenDto: RefreshTokenDto,
   ): Promise<UserLoginResponseDto> {
-    return this.refreshTokens(oldRefreshToken);
+    return this.authService.refreshTokens(oldRefreshTokenDto);
   }
 }

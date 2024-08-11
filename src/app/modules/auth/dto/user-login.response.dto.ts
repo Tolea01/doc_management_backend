@@ -9,7 +9,7 @@ export class UserLoginResponseDto {
     description: 'JWT Token',
   })
   @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  accesToken: string;
+  accessToken: string;
 
   @ApiProperty({
     example:

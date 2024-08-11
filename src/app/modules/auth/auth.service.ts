@@ -13,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserItemDto } from '../user/dto/user-item.dto';
 import { IJwtUserPayload } from 'app/common/interfaces/jwt-user-payload.interface';
 import { TokenResponseDto } from './dto/tokens.response.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -51,7 +52,7 @@ export class AuthService {
       );
 
       if (verifyUserDataPassword) {
-        return this.generateTokens(jwtPayload);
+        return await this.generateTokens(jwtPayload);
       } else {
         throw new UnauthorizedException(
           await translateMessage(this.i18n, 'error.invalid_credentials'),
@@ -65,39 +66,42 @@ export class AuthService {
   }
 
   async generateTokens(payload: IJwtUserPayload): Promise<TokenResponseDto> {
-    const refreshToken = await this.jwtService.signAsync(payload);
-    const accesToken = await this.jwtService.signAsync(payload, {
+    const accessToken = await this.jwtService.signAsync(payload, {
+      expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
+      secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
+    });
+    const refreshToken = await this.jwtService.signAsync(payload, {
       expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
       secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
     });
 
-    return { accesToken, refreshToken };
+    return { accessToken, refreshToken };
   }
 
-  async refreshTokens(oldRefreshToken: string): Promise<TokenResponseDto> {
-    try {
-      const decodedUser: any = await this.jwtService.verifyAsync(
-        oldRefreshToken,
-        {
-          secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
-        },
-      );
+  async refreshTokens(
+    oldRefreshTokenDto: RefreshTokenDto,
+  ): Promise<TokenResponseDto> {
+    const { oldRefreshToken } = oldRefreshTokenDto;
+    const decodedUser: any = await this.jwtService.verifyAsync(
+      oldRefreshToken,
+      {
+        secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
+      },
+    );
 
-      const user: UserItemDto | undefined = await this.userService.findOne(
-        decodedUser.sub,
-      );
+    const user: UserItemDto | undefined = await this.userService.findOne(
+      decodedUser.sub,
+    );
 
-      if (!user) {
-        throw new UnauthorizedException(
-          await translateMessage(this.i18n, 'error.token_generation_failed'),
-        );
-      }
+    const { props, sub } = decodedUser;
+    const userPayload = { props, sub };
 
-      return this.generateTokens(decodedUser);
-    } catch (error) {
+    if (!user) {
       throw new UnauthorizedException(
         await translateMessage(this.i18n, 'error.token_generation_failed'),
       );
     }
+
+    return this.generateTokens(userPayload);
   }
 }

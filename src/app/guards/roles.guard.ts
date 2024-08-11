@@ -26,14 +26,15 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
     );
     const { user } = context.switchToHttp().getRequest();
+    const userRole: UserRole = user?.userRole;
 
     if (!roles || isPublicRoute || roles.includes(UserRole.ALL)) {
       return true;
     }
 
-    if (!user.userRole || !RolesGuard.matchRoles(roles, user.userRole)) {
+    if (!userRole || !RolesGuard.matchRoles(roles, userRole)) {
       const message = await translateMessage(this.i18n, 'error.unauthorized');
-      throw user.userRole
+      throw userRole
         ? new ForbiddenException(message)
         : new UnauthorizedException(message);
     }
