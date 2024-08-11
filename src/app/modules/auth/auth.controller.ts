@@ -50,6 +50,7 @@ export class AuthController {
     summary: 'Login user',
     description: 'This is a public route',
   })
+  @ApiResponse({ status: 200, description: 'User has successfully logged in' })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'User is not registered' })
   @ApiResponse({ status: 500, description: 'Server error' })
