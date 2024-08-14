@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  Res,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
@@ -9,12 +16,13 @@ import {
 import { UserRegisterPayloadDto } from './dto/user.register.payload.dto';
 import { UserRegisterResponseDto } from './dto/user-register.response.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
-import { UserLoginResponseDto } from './dto/user-login.response.dto';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
 import { UserRole } from '../user/roles/role.enum';
 import { PublicRoute } from 'app/common/decorators/auth/public-route.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Response } from 'express';
+import { TokenResponseDto } from './dto/tokens.response.dto';
 
 @ApiTags('Authentification')
 @ApiLanguageHeader()
@@ -56,8 +64,13 @@ export class AuthController {
   @ApiResponse({ status: 500, description: 'Server error' })
   async login(
     @Body() userData: UserLoginPayloadDto,
-  ): Promise<UserLoginResponseDto> {
-    return this.authService.login(userData);
+    @Res() res: Response,
+  ): Promise<void> {
+    const tokens: TokenResponseDto = await this.authService.login(userData);
+
+    await this.authService.setRefreshTokenToCookies(tokens, res);
+
+    res.status(HttpStatus.OK).json(tokens);
   }
 
   @Post('refresh-tokens')
@@ -74,7 +87,13 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async refreshTokens(
     @Body() oldRefreshTokenDto: RefreshTokenDto,
-  ): Promise<UserLoginResponseDto> {
-    return this.authService.refreshTokens(oldRefreshTokenDto);
+    @Res() res: Response,
+  ): Promise<void> {
+    const refreshToken: TokenResponseDto =
+      await this.authService.refreshTokens(oldRefreshTokenDto);
+
+    await this.authService.setRefreshTokenToCookies(refreshToken, res);
+
+    res.status(HttpStatus.OK).json(refreshToken);
   }
 }

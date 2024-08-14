@@ -14,6 +14,8 @@ import { UserItemDto } from '../user/dto/user-item.dto';
 import { IJwtUserPayload } from 'app/common/interfaces/jwt-user-payload.interface';
 import { TokenResponseDto } from './dto/tokens.response.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { Response } from 'express';
+import { IRefreshTokenCookie } from 'app/common/interfaces/refresh-token-cookie.interface';
 
 @Injectable()
 export class AuthService {
@@ -102,6 +104,31 @@ export class AuthService {
       );
     }
 
-    return this.generateTokens(userPayload);
+    return await this.generateTokens(userPayload);
+  }
+
+  async setRefreshTokenToCookies(
+    tokens: TokenResponseDto,
+    response: Response,
+  ): Promise<void> {
+    const { exp } = this.jwtService.decode(tokens.refreshToken) as {
+      exp: number;
+    };
+
+    const refreshTokenCookieName: string = this.configService.get<string>(
+      'REFRESH_TOKEN_COOKIES',
+    );
+
+    const cookieOptions: IRefreshTokenCookie = {
+      httpOnly: true,
+      sameSite: 'lax',
+      expires: new Date(exp * 1000),
+      secure:
+        this.configService.get<string>('NODE_ENV', 'development') ===
+        'production',
+      path: '/',
+    };
+
+    response.cookie(refreshTokenCookieName, tokens.refreshToken, cookieOptions);
   }
 }
