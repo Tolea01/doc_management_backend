@@ -71,7 +71,7 @@ export class PersonService {
       return await paginate<Person>(queryBuilder, { limit, page });
     } catch (error) {
       throw new InternalServerErrorException(
-        await translateMessage(this.i18n, 'error.fetch_users_failed', {
+        await translateMessage(this.i18n, 'error.fetch_persons_failed', {
           error: error.message,
         }),
       );

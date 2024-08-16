@@ -3,7 +3,7 @@
   "MIN_MAX": "{property} trebuie să aibă între {constraints.0} și {constraints.1} caractere",
   "INVALID_STRING": "{property} trebuie să fie un șir de caractere",
   "INVALID_USER_ENUM": "{property} trebuie să fie unul dintre [Admin, Director, Secretary, HeadOfDirection]",
-  "INVALID_PERSON_ENUM": "{property} trebuie să fie unul dintre [Legal, Physical]",
+  "INVALID_PERSON_ENUM": "{property} trebuie să fie unul dintre [legal, physical]",
   "INVALID_NUMBER": "{property} trebuie să fie un număr valid",
   "MAX": "{property} cu valoarea: \"{value}\" trebuie să fie mai mic de {constraints.0}",
   "INVALID_PROPERTY": "{property} nu este valid",
