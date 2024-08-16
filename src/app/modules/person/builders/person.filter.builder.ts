@@ -1,23 +1,7 @@
 import { Equal } from 'typeorm';
 
 export class PersonFilterBuilder {
-  constructor(private readonly filter: Record<string, any>) {
-    // if (filter && filter.type && filter.type.length) {
-    //   this.filter.type = Equal(filter.type);
-    // }
-
-    // if (filter && filter.name && filter.name.length) {
-    //   this.filter.name = Equal(filter.name);
-    // }
-
-    // if (filter && filter.address && filter.address.length) {
-    //   this.filter.address = Equal(filter.address);
-    // }
-
-    // if (filter && filter.email && filter.email.length) {
-    //   this.filter.email = Equal(filter.email_address);
-    // }
-
+  constructor(private readonly filter: Record<string, any> = {}) {
     const filterOptions: string[] = [
       'type',
       'name',

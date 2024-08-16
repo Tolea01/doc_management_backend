@@ -2,24 +2,12 @@ import { Equal } from 'typeorm';
 
 export class UserFilterBuilder {
   constructor(private readonly filter: Record<string, any> = {}) {
-    if (filter && filter.name && filter.name.length) {
-      this.filter.name = Equal(filter.name);
-    }
+    const filterOptions: string[] = ['name', 'surname', 'role', 'phone'];
 
-    if (filter && filter.surname && filter.surname.length) {
-      this.filter.surname = Equal(filter.surname);
-    }
-
-    if (filter && filter.role && filter.role.length) {
-      this.filter.role = Equal(filter.role);
-    }
-
-    if (filter && filter.phone && filter.phone.length) {
-      this.filter.phone = Equal(filter.phone_number);
-    }
-
-    if (filter && filter.role && filter.role.length) {
-      this.filter.role = Equal(filter.role);
+    for (const filterOption of filterOptions) {
+      if (filter && filter[filterOption] && filter[filterOption].Length) {
+        this.filter = Equal(filter[filterOption]);
+      }
     }
   }
 
