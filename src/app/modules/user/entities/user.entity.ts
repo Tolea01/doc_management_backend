@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
 import { UserRole } from '../roles/role.enum';
+import { IncomingDocument } from '../../incoming_documents/entities/incoming_document.entity';
 
 @Entity('users')
 export class User {
@@ -48,4 +49,14 @@ export class User {
     unique: true,
   })
   email_address: string;
+
+  @ManyToMany(
+    () => IncomingDocument,
+    (document: IncomingDocument) => document.executors,
+    {
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    },
+  )
+  incoming_documents: IncomingDocument[];
 }

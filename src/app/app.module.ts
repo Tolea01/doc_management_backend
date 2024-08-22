@@ -34,8 +34,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [
-    { provide: APP_GUARD, useClass: JwtAuthGuard },
-    { provide: APP_GUARD, useClass: RolesGuard },
+    // { provide: APP_GUARD, useClass: JwtAuthGuard },
+    // { provide: APP_GUARD, useClass: RolesGuard },
   ],
 })
 export class AppModule {}

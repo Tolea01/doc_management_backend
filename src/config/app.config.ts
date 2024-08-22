@@ -3,9 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import dbConnectionOptions from 'src/database/config/db.connection.config';
 import { JwtModuleOptions } from '@nestjs/jwt';
-import { Injectable } from '@nestjs/common';
-import { join } from 'path';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { extname, join } from 'path';
 import I18nConfig from 'app/common/interfaces/I18nConfig.interface';
+import { diskStorage } from 'multer';
 
 @Injectable()
 export default class AppConfig {
@@ -44,6 +45,33 @@ export default class AppConfig {
       secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
       signOptions: {
         expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
+      },
+    };
+  }
+
+  public getMulterOptions() {
+    return {
+      storage: diskStorage({
+        destination: process.env.INCOMING_DOCUMENTS_UPLOAD_DEST,
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + file.originalname.replace(/\s/g, '_');
+          const ext = extname(file.originalname);
+          const filename = `${uniqueSuffix}${ext}`;
+          callback(null, filename);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (file.mimetype !== 'application/pdf') {
+          return callback(
+            new BadRequestException('Fișierul trebuie să fie un PDF'),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+      limits: {
+        fileSize: 200 * 1024 * 1024,
       },
     };
   }
