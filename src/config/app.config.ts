@@ -4,13 +4,16 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import dbConnectionOptions from 'src/database/config/db.connection.config';
 import { JwtModuleOptions } from '@nestjs/jwt';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { extname, join } from 'path';
+import { join } from 'path';
 import I18nConfig from 'app/common/interfaces/I18nConfig.interface';
 import { diskStorage } from 'multer';
+import { Request } from 'express';
 
 @Injectable()
 export default class AppConfig {
-  constructor(private configService: ConfigService) {}
+  private configService: ConfigService = new ConfigService();
+
+  constructor() {}
 
   public getCorsOptions(): CorsOptions {
     return {
@@ -49,22 +52,28 @@ export default class AppConfig {
     };
   }
 
-  public getMulterOptions() {
+  public getMulterOptions(destination: string) {
     return {
       storage: diskStorage({
-        destination: process.env.INCOMING_DOCUMENTS_UPLOAD_DEST,
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
+        destination: this.configService.get<string>(`${destination}`),
+        filename: (
+          req: Request,
+          file: Express.Multer.File,
+          callback: (error: Error | null, filename: string) => void,
+        ) => {
+          const filename =
             Date.now() + '-' + file.originalname.replace(/\s/g, '_');
-          const ext = extname(file.originalname);
-          const filename = `${uniqueSuffix}${ext}`;
           callback(null, filename);
         },
       }),
-      fileFilter: (req, file, callback) => {
+      fileFilter: (
+        req: Request,
+        file: Express.Multer.File,
+        callback: (error: Error | null, acceptFile: boolean) => void,
+      ) => {
         if (file.mimetype !== 'application/pdf') {
           return callback(
-            new BadRequestException('Fișierul trebuie să fie un PDF'),
+            new BadRequestException('Fișierul PDF nu este valid'),
             false,
           );
         }

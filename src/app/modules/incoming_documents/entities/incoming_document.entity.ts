@@ -1,10 +1,12 @@
-import { PersonType } from 'app/modules/person/types/type.enum';
+import { Person } from 'app/modules/person/entities/person.entity';
 import { User } from 'app/modules/user/entities/user.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -26,14 +28,16 @@ export class IncomingDocument {
   })
   number: string;
 
-  @Column({ type: 'enum', enum: PersonType })
-  sender: PersonType;
+  @ManyToOne(() => Person, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'sender_id' })
+  sender: Person;
+
+  @ManyToOne(() => Person, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
+  @JoinColumn({ name: 'received_id' })
+  received: Person;
 
   @Column({ type: 'text', nullable: true })
   comment?: string;
-
-  @Column({ type: 'enum', enum: PersonType })
-  received: PersonType;
 
   @Column({ type: 'date' })
   initial_date: string;

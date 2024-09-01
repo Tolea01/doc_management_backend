@@ -7,21 +7,23 @@ import {
   Param,
   Delete,
   UseInterceptors,
-  UploadedFile,
   UploadedFiles,
+  HttpCode,
 } from '@nestjs/common';
 import { IncomingDocumentsService } from './incoming_documents.service';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
 import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import {
-  fileUploadValidator,
-  fileNameTransformer,
-} from './validators/file-upload.validator';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
 import { UserRole } from '../user/roles/role.enum';
+import AppConfig from 'src/config/app.config';
 
 @ApiTags('Incoming Documents')
 @ApiLanguageHeader()
@@ -34,16 +36,46 @@ export class IncomingDocumentsController {
   ) {}
 
   @Post('upload')
-  @UseInterceptors(FilesInterceptor('files', 10, fileNameTransformer()))
-  async create(
-    // @Body() createIncomingDocumentDto: CreateIncomingDocumentDto,
+  @UseInterceptors(
+    FilesInterceptor(
+      'files',
+      15,
+      new AppConfig().getMulterOptions('INCOMING_DOCUMENTS_UPLOAD_DEST'),
+    ),
+  )
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Upload incoming documents',
+    description: 'Requires DIRECTOR or SECRETARY role to upload a document',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The documents has been successfully uploaded',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async upload(
     @UploadedFiles()
     pdfFiles: Array<Express.Multer.File>,
   ) {
-    return this.incomingDocumentsService.create(
-      // createIncomingDocumentDto,
-      pdfFiles,
-    );
+    return this.incomingDocumentsService.saveFiles(pdfFiles);
+  }
+
+  @Post('create')
+  @ApiOperation({
+    summary: 'Create a incoming document',
+    description: 'Requires DIRECTOR or SECRETARY role to upload a document',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The document has been successfully created',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async create(
+    @Body() createIncomingDocumentDto: CreateIncomingDocumentDto,
+  ): Promise<CreateIncomingDocumentDto> {
+    return this.incomingDocumentsService.create(createIncomingDocumentDto);
   }
 
   @Get()

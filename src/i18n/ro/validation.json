@@ -10,5 +10,6 @@
   "INVALID_DATE_STRING": "{property} trebuie să fie un șir de caractere de dată validă",
   "INVALID_EMAIL": "{property} trebuie să fie un email valid",
   "INVALID_SENDER": "Persoana nu este valida",
-  "INVALID_RECEIVED": "Persoana nu este valida"
+  "INVALID_RECEIVED": "Persoana nu este valida",
+  "INVALID_PDF": "Fișierul trebuie să fie un PDF valid"
 }

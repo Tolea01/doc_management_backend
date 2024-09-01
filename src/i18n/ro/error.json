@@ -13,5 +13,8 @@
   "password_updated": "Parola a fost actualizată cu succes",
   "update_failed": "Eșec la actualizarea utilizatorului cu id {id}. {error}",
   "delete_failed": "Eșec la ștergerea utilizatorului cu id {id}. {error}",
-  "token_generation_failed": "Generarea token-urilor a eșuat."
+  "token_generation_failed": "Generarea token-urilor a eșuat.",
+  "document_already_exist": "Documentul cu numărul {initial_number} există deja",
+  "sender_received_executor_not_found": "Expeditorul, persoana primită sau executorul nu a fost găsit",
+  "document_creation_failed": "Crearea documentului a eșuat. {error}"
 }

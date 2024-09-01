@@ -13,8 +13,7 @@ import { ConfigService } from '@nestjs/config';
     UserModule,
     PassportModule,
     JwtModule.registerAsync({
-      useFactory: (configService: ConfigService) =>
-        new AppConfig(configService).getJwtConfig(),
+      useFactory: () => new AppConfig().getJwtConfig(),
       inject: [ConfigService],
     }),
   ],

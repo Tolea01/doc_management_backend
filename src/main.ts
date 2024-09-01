@@ -5,7 +5,6 @@ import buildAppiDocs from './docs/swagger.builder';
 import AppConfig from './config/app.config';
 import { config as dotenvConfig } from 'dotenv';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
-import { ConfigService } from '@nestjs/config';
 
 dotenvConfig();
 
@@ -16,7 +15,7 @@ async function bootstrap(): Promise<void> {
     .setGlobalPrefix('api')
     .useGlobalPipes(new I18nValidationPipe())
     .useGlobalFilters(new I18nValidationExceptionFilter())
-    .enableCors(new AppConfig(new ConfigService()).getCorsOptions());
+    .enableCors(new AppConfig().getCorsOptions());
 
   buildAppiDocs(app);
 

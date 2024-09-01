@@ -1,21 +1,13 @@
 import { Module } from '@nestjs/common';
 import { IncomingDocumentsService } from './incoming_documents.service';
 import { IncomingDocumentsController } from './incoming_documents.controller';
-import { MulterModule } from '@nestjs/platform-express';
-import { ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { IncomingDocument } from './entities/incoming_document.entity';
+import { User } from '../user/entities/user.entity';
+import { Person } from '../person/entities/person.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([IncomingDocument]),
-    MulterModule.registerAsync({
-      useFactory: async (configService: ConfigService) => ({
-        dest: configService.get<string>('INCOMING_DOCUMENTS_UPLOAD_DEST'),
-      }),
-      inject: [ConfigService],
-    }),
-  ],
+  imports: [TypeOrmModule.forFeature([IncomingDocument, User, Person])],
   controllers: [IncomingDocumentsController],
   providers: [IncomingDocumentsService],
 })

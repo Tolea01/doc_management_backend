@@ -18,13 +18,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ...AllModules,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) =>
-        new AppConfig(configService).databaseConnection(),
+      useFactory: () => new AppConfig().databaseConnection(),
       inject: [ConfigService],
     }),
     I18nModule.forRootAsync({
-      useFactory: (configService: ConfigService) =>
-        new AppConfig(configService).getI18nConfig(),
+      useFactory: () => new AppConfig().getI18nConfig(),
       resolvers: [
         new QueryResolver(['lang']),
         new HeaderResolver(['language']),

@@ -13,5 +13,8 @@
   "password_updated": "Пароль успешно обновлен",
   "update_failed": "Не удалось обновить пользователя с ID {id}. {error}",
   "delete_failed": "Не удалось удалить пользователя с ID {id}. {error}",
-  "token_generation_failed": "Ошибка генерации токенов."
+  "token_generation_failed": "Ошибка генерации токенов.",
+  "document_already_exist": "Документ с номерои {initial_number} уже существует",
+  "sender_received_executor_not_found": "Отправитель, получатель или исполнитель не найдены",
+  "document_creation_failed": "Создание документа не удалось. {error}"
 }

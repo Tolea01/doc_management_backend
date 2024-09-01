@@ -10,5 +10,6 @@
   "INVALID_PROPERTY": "{property} недействительный",
   "INVALID_EMAIL": "{property} должно быть действительным email",
   "INVALID_SENDER": "Неверный отправитель",
-  "INVALID_RECEIVED": "Неверный получатель"
+  "INVALID_RECEIVED": "Неверный получатель",
+  "INVALID_PDF": "Файл должен быть PDF"
 }

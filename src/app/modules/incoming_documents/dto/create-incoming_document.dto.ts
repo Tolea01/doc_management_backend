@@ -4,7 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsArray,
+  IsNumber,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
@@ -15,7 +15,7 @@ export class CreateIncomingDocumentDto {
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
   @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  iniatial_number: string;
+  initial_number: string;
 
   @ApiProperty({
     example: '01-07/23',
@@ -30,8 +30,8 @@ export class CreateIncomingDocumentDto {
     description: 'Legal or physical person',
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  sender: string;
+  @IsNumber({}, { message: i18nValidationMessage('validation.INVALID_NUMBER') })
+  sender: number;
 
   @ApiProperty({
     example: 'comment',
@@ -46,8 +46,8 @@ export class CreateIncomingDocumentDto {
     description: 'Legal or physical person received the document',
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  received: string;
+  @IsNumber({}, { message: i18nValidationMessage('validation.INVALID_NUMBER') })
+  received: number;
 
   @ApiProperty({
     example: '01-02-2002',
@@ -76,8 +76,11 @@ export class CreateIncomingDocumentDto {
     description: 'List of executor IDs',
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
-  @IsArray()
-  executor: number[];
+  @IsNumber(
+    {},
+    { each: true, message: i18nValidationMessage('validation.INVALID_NUMBER') },
+  )
+  executors: number[];
 
   @ApiProperty({
     example: '2024-08-19',
