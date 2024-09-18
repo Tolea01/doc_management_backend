@@ -43,6 +43,13 @@ $ yarn run start:dev
 
 # production mode
 $ yarn run start:prod
+
+# windows run migrations
+$ $env:MIGRATION_NAME="init"; yarn migration:generate
+$ set MIGRATION_NAME=init && yarn migration:generate
+
+# unix systems run migrations
+$ MIGRATION_NAME=init yarn migration:generate
 ```
 
 ## Test
@@ -57,6 +64,16 @@ $ yarn run test:e2e
 # test coverage
 $ yarn run test:cov
 ```
+
+## Remarks
+
+To generate or create migrations in windows use the following scripts in package.json:
+"migration:generate": "yarn build && yarn typeorm -d ./dist/database/config/config/typeorm.config.js migration:generate ./src/database/ migrations/%MIGRATION_NAME%",
+"migration:create":"yarn build && yarn typeorm migration:create ./src/database/migrations/%MIGRATION_NAME%",
+
+To generate or create migrations in unix like systems use the following scripts in package.json:
+"migration:generate": "yarn build && yarn typeorm -d ./dist/database/config/typeorm.config.js migration:generate ./src/database/migrations/${MIGRATION_NAME}",
+"migration:create": "yarn build && yarn typeorm migration:create ./src/database/migrations/${MIGRATION_NAME}",
 
 ## Support
 
