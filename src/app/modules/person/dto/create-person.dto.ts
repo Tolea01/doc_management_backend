@@ -4,7 +4,13 @@ import { i18nValidationMessage } from 'nestjs-i18n';
 import { PersonType } from '../types/type.enum';
 
 export class CreatePersonDto {
-  @ApiProperty({ example: 'legal', description: 'Person Type' })
+  @ApiProperty({
+    example: 'legal',
+    description: 'Person Type',
+    enum: PersonType,
+    enumName: 'PersonType',
+    default: PersonType.LEGAL,
+  })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
   @IsEnum(PersonType, {
     message: i18nValidationMessage('validation.INVALID_PERSON_ENUM'),

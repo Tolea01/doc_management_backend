@@ -7,8 +7,8 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-import { UserRole } from '../roles/role.enum';
 import { i18nValidationMessage } from 'nestjs-i18n';
+import { UserRole } from '../roles/role.enum';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'John', description: 'Name' })
@@ -35,7 +35,13 @@ export class CreateUserDto {
   })
   password: string;
 
-  @ApiProperty({ example: 'admin', description: 'User role' })
+  @ApiProperty({
+    example: 'admin',
+    description: 'User role',
+    enum: UserRole,
+    enumName: 'UserRole',
+    default: UserRole.ADMIN,
+  })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
   @IsEnum(UserRole, {
     message: i18nValidationMessage('validation.INVALID_USER_ENUM'),
