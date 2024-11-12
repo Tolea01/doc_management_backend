@@ -4,16 +4,21 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  StreamableFile,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { translateMessage } from 'app/utils/translateMessage';
+import { createReadStream, existsSync } from 'fs';
+import { I18nService } from 'nestjs-i18n';
+import { resolve } from 'path';
+import { In, Repository } from 'typeorm';
+import { ReadStream } from 'typeorm/platform/PlatformTools';
+import { Person } from '../person/entities/person.entity';
+import { User } from '../user/entities/user.entity';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
 import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { IncomingDocument } from './entities/incoming_document.entity';
-import { In, Repository } from 'typeorm';
-import { I18nService } from 'nestjs-i18n';
-import { translateMessage } from 'app/utils/translateMessage';
-import { User } from '../user/entities/user.entity';
-import { Person } from '../person/entities/person.entity';
 
 @Injectable()
 export class IncomingDocumentsService {
@@ -25,21 +30,53 @@ export class IncomingDocumentsService {
     @InjectRepository(Person)
     private readonly personRepository: Repository<Person>,
     private readonly i18n: I18nService,
+    private readonly configService: ConfigService,
   ) {}
 
   async saveFiles(pdfFiles: Array<Express.Multer.File>) {
-    const filesName: string[] = pdfFiles.map((file) => file.filename);
+    try {
+      const filesName: string[] = pdfFiles.map((file) => file.filename);
 
-    if (!pdfFiles || !filesName.length) {
-      throw new BadRequestException(
-        await translateMessage(this.i18n, 'validation.INVALID_PDF'),
+      if (!pdfFiles || !filesName.length) {
+        throw new BadRequestException(
+          await translateMessage(this.i18n, 'validation.INVALID_PDF'),
+        );
+      }
+
+      return {
+        message: await translateMessage(this.i18n, 'message.UPLOAD_SUCCESS'),
+        filenames: filesName,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.server_error', { error }),
       );
     }
+  }
 
-    return {
-      message: await translateMessage(this.i18n, 'message.UPLOAD_SUCCESS'),
-      filenames: filesName,
-    };
+  async downloadFile(filename: string): Promise<StreamableFile> {
+    try {
+      const uploadPath: string = this.configService.get<string>(
+        'INCOMING_DOCUMENTS_UPLOAD_DEST',
+      );
+
+      const filePath: string = resolve(process.cwd(), uploadPath, filename);
+
+      if (!existsSync(filePath)) {
+        throw new NotFoundException(
+          await translateMessage(this.i18n, 'message.FILE_NOT_FOUND'),
+        );
+      }
+
+      const fileStream: ReadStream = createReadStream(filePath);
+      return new StreamableFile(fileStream);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.server_error', {
+          error,
+        }),
+      );
+    }
   }
 
   async create(

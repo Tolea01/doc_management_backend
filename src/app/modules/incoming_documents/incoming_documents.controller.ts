@@ -1,18 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseInterceptors,
-  UploadedFiles,
+  Get,
   HttpCode,
+  Param,
+  Patch,
+  Post,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { IncomingDocumentsService } from './incoming_documents.service';
-import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
-import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
@@ -20,10 +17,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
-import { UserRole } from '../user/roles/role.enum';
+import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import AppConfig from 'src/config/app.config';
+import { UserRole } from '../user/roles/role.enum';
+import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
+import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
+import { IncomingDocumentsService } from './incoming_documents.service';
 
 @ApiTags('Incoming Documents')
 @ApiLanguageHeader()
@@ -76,6 +76,21 @@ export class IncomingDocumentsController {
     @Body() createIncomingDocumentDto: CreateIncomingDocumentDto,
   ): Promise<CreateIncomingDocumentDto> {
     return this.incomingDocumentsService.create(createIncomingDocumentDto);
+  }
+
+  @Get('download/:filename')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Download incoming documents',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The documents has been successfully downloaded',
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async downloadFile(@Param('filename') filename: string) {
+    return this.incomingDocumentsService.downloadFile(filename);
   }
 
   @Get()
