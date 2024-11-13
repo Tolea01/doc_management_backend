@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsISO8601,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
-  IsNumber,
 } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
@@ -26,8 +26,8 @@ export class CreateIncomingDocumentDto {
   number: string;
 
   @ApiProperty({
-    example: 'MOLDINDCONBANK',
-    description: 'Legal or physical person',
+    example: 3,
+    description: 'id of the person',
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
   @IsNumber({}, { message: i18nValidationMessage('validation.INVALID_NUMBER') })
@@ -42,8 +42,8 @@ export class CreateIncomingDocumentDto {
   comment?: string;
 
   @ApiProperty({
-    example: 'MOLDINDCONBANK',
-    description: 'Legal or physical person received the document',
+    example: 2,
+    description: 'id of the person received the document',
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
   @IsNumber({}, { message: i18nValidationMessage('validation.INVALID_NUMBER') })
@@ -91,4 +91,10 @@ export class CreateIncomingDocumentDto {
     { message: i18nValidationMessage('validation.INVALID_DATE_STRING') },
   )
   execution_time: string;
+
+  @ApiProperty({
+    example: 'location',
+  })
+  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  location: string;
 }
