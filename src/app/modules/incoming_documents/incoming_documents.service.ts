@@ -9,16 +9,21 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { translateMessage } from 'app/utils/translateMessage';
+import { plainToInstance } from 'class-transformer';
 import { createReadStream, existsSync } from 'fs';
 import { I18nService } from 'nestjs-i18n';
+import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { resolve } from 'path';
-import { In, Repository } from 'typeorm';
+import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { ReadStream } from 'typeorm/platform/PlatformTools';
 import { Person } from '../person/entities/person.entity';
 import { User } from '../user/entities/user.entity';
+import { IncomingDocumentFilterBuilder } from './builders/incoming_document.filter.builder';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
 import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
 import { IncomingDocument } from './entities/incoming_document.entity';
+import { IncomingDocumentSort } from './validators/incoming_document.sort.validator';
 
 @Injectable()
 export class IncomingDocumentsService {
@@ -137,8 +142,38 @@ export class IncomingDocumentsService {
     }
   }
 
-  findAll() {
-    return `This action returns all incomingDocuments`;
+  async findAll(
+    limit?: number,
+    page?: number,
+    sortOrder?: SortOrder,
+    sortColumn?: IncomingDocumentSort,
+    filter?: Record<string, any>,
+  ): Promise<Pagination<IncomingDocument>> {
+    try {
+      const filterBuilder: IncomingDocumentFilterBuilder =
+        new IncomingDocumentFilterBuilder(filter);
+      const queryBuilder: SelectQueryBuilder<IncomingDocument> =
+        this.incomingDocumentRepository
+          .createQueryBuilder('incoming_document')
+          .where(filterBuilder.getFilter())
+          .orderBy(sortColumn, sortOrder)
+          .skip(page * limit)
+          .take(limit);
+
+      const result: Pagination<IncomingDocument, IPaginationMeta> =
+        await paginate<IncomingDocument>(queryBuilder, { limit, page });
+
+      return {
+        ...result,
+        items: plainToInstance(IncomingDocument, result.items),
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.fetch_documents_failed', {
+          error: error.message,
+        }),
+      );
+    }
   }
 
   findOne(id: number) {

@@ -5,7 +5,7 @@ export class UserFilterBuilder {
     const filterOptions: string[] = ['name', 'surname', 'role', 'phone'];
 
     for (const filterOption of filterOptions) {
-      if (filter && filter[filterOption] && filter[filterOption].Length) {
+      if (filter && filter[filterOption] && filter[filterOption].length) {
         this.filter = Equal(filter[filterOption]);
       }
     }

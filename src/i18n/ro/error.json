@@ -18,5 +18,6 @@
   "sender_received_executor_not_found": "Expeditorul, persoana primită sau executorul nu a fost găsit",
   "document_creation_failed": "Crearea documentului a eșuat. {error}",
   "server_error": "Eroare de server. {error}",
-  "file_not_found": "Fișierul nu a fost găsit"
+  "file_not_found": "Fișierul nu a fost găsit",
+  "fetch_documents_failed": "Eșec la obținerea documentelor. {error}"
 }
