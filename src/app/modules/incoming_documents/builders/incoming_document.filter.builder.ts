@@ -11,6 +11,7 @@ export class IncomingDocumentFilterBuilder {
       'date',
       'executor',
       'execution_time',
+      'location',
     ];
 
     for (const filterOption of filterOptions) {

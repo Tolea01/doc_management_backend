@@ -1,12 +1,15 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -19,11 +22,16 @@ import {
 } from '@nestjs/swagger';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
+import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
+import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
 import AppConfig from 'src/config/app.config';
+import paginationConfig from 'src/config/pagination.config';
+import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
 import { UserRole } from '../user/roles/role.enum';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
 import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
 import { IncomingDocumentsService } from './incoming_documents.service';
+import { IncomingDocumentSort } from './validators/incoming_document.sort.validator';
 
 @ApiTags('Incoming Documents')
 @ApiLanguageHeader()
@@ -93,9 +101,43 @@ export class IncomingDocumentsController {
     return this.incomingDocumentsService.downloadFile(filename);
   }
 
-  @Get()
-  async findAll() {
-    return this.incomingDocumentsService.findAll();
+  @Get('list')
+  @ApiOperation({
+    summary: 'Get a list of incoming documents',
+    // description: 'Accessible by ALL users',
+  })
+  @ParamApiOperation('incoming document')
+  @QueryApiOperation('limit', 'number', 'items per page')
+  @QueryApiOperation('page', 'number', 'page number')
+  @QueryApiOperation('sortOrder', 'enum', 'sort order')
+  @QueryApiOperation('sortColumn', 'enum', 'sort column')
+  @QueryApiOperation('filter', 'Object', 'filters documents')
+  @ApiResponse({
+    status: 200,
+    description: 'Return list of incoming documents',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Error when searching for parameters',
+  })
+  async findAll(
+    @Query('limit', new DefaultValuePipe(paginationConfig.limit), ParseIntPipe)
+    limit: number,
+    @Query('page', new DefaultValuePipe(paginationConfig.page), ParseIntPipe)
+    page: number,
+    @Query('sortOrder', new DefaultValuePipe(paginationConfig.sortOrder))
+    sortOrder: SortOrder,
+    @Query('sortColumn', new DefaultValuePipe(paginationConfig.sortColumn))
+    sortColumn: IncomingDocumentSort,
+    @Query('filter') filter: Record<string, any>,
+  ) {
+    return this.incomingDocumentsService.findAll(
+      limit,
+      page,
+      sortOrder,
+      sortColumn,
+      filter,
+    );
   }
 
   @Get(':id')
