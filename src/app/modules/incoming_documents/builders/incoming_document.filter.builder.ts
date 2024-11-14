@@ -15,7 +15,7 @@ export class IncomingDocumentFilterBuilder {
     ];
 
     for (const filterOption of filterOptions) {
-      if (filter && filter[filterOption] && filter[filterOption].length) {
+      if (filter && filter[filterOption] && filter[filterOption].Length) {
         this.filter = Equal(filter[filterOption]);
       }
     }

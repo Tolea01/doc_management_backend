@@ -9,7 +9,6 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { translateMessage } from 'app/utils/translateMessage';
-import { plainToInstance } from 'class-transformer';
 import { createReadStream, existsSync } from 'fs';
 import { I18nService } from 'nestjs-i18n';
 import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
@@ -163,10 +162,7 @@ export class IncomingDocumentsService {
       const result: Pagination<IncomingDocument, IPaginationMeta> =
         await paginate<IncomingDocument>(queryBuilder, { limit, page });
 
-      return {
-        ...result,
-        items: plainToInstance(IncomingDocument, result.items),
-      };
+      return result;
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.fetch_documents_failed', {
