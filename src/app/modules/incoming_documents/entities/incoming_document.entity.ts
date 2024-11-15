@@ -29,11 +29,11 @@ export class IncomingDocument {
   number: string;
 
   @ManyToOne(() => Person, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'sender_id' })
+  @JoinColumn({ name: 'sender' })
   sender: Person;
 
   @ManyToOne(() => Person, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'received_id' })
+  @JoinColumn({ name: 'received' })
   received: Person;
 
   @Column({ type: 'text', nullable: true })
