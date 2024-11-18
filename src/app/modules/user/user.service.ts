@@ -4,20 +4,21 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
-import { UserItemDto } from './dto/user-item.dto';
+import { translateMessage } from 'app/utils/translateMessage';
 import * as argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
 import { SortOrder } from 'database/validators/typeorm.sort.validator';
-import { UserSort } from './validators/user.sort.validator';
-import { UserFilterBuilder } from './builders/user.filter.builder';
-import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { I18nService } from 'nestjs-i18n';
-import { translateMessage } from 'app/utils/translateMessage';
+import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { UserFilterBuilder } from './builders/user.filter.builder';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserItemDto } from './dto/user-item.dto';
+import { UserFilterDto } from './dto/user.filter.dto';
+import { User } from './entities/user.entity';
+import { UserSort } from './validators/user.sort.validator';
 
 @Injectable()
 export class UserService {
@@ -60,7 +61,7 @@ export class UserService {
     page?: number,
     sortOrder?: SortOrder,
     sortColumn?: UserSort,
-    filter?: Record<string, any>,
+    filter?: UserFilterDto,
   ): Promise<Pagination<UserItemDto>> {
     try {
       const filterBuilder: UserFilterBuilder = new UserFilterBuilder(filter);

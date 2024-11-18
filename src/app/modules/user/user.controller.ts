@@ -1,34 +1,35 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
+  Controller,
   DefaultValuePipe,
+  Delete,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserItemDto } from './dto/user-item.dto';
+import { Role } from 'app/common/decorators/auth/roles.decorator';
+import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import ParamApiOperation from 'common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'common/decorators/swagger/query.api.operation';
+import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import paginationConfig from 'src/config/pagination.config';
-import { SortOrder } from 'database/validators/typeorm.sort.validator';
-import { UserSort } from './validators/user.sort.validator';
-import { Role } from 'app/common/decorators/auth/roles.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserItemDto } from './dto/user-item.dto';
+import { UserFilterDto } from './dto/user.filter.dto';
 import { UserRole } from './roles/role.enum';
-import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
+import { UserService } from './user.service';
+import { UserSort } from './validators/user.sort.validator';
 
 @ApiTags('Users')
 @ApiLanguageHeader()
@@ -80,7 +81,7 @@ export class UserController {
     sortOrder: SortOrder,
     @Query('sortColumn', new DefaultValuePipe(paginationConfig.sortColumn))
     sortColumn: UserSort,
-    @Query('filter') filter: Record<string, any>,
+    @Query('filter') filter: UserFilterDto,
   ): Promise<Pagination<UserItemDto>> {
     return this.userService.findAll(limit, page, sortOrder, sortColumn, filter);
   }
