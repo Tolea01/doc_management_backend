@@ -3,7 +3,7 @@ import { ApiQuery } from '@nestjs/swagger';
 
 const QueryApiOperation = (
   param: string,
-  type?: string,
+  type?: any,
   description?: string,
 ): MethodDecorator => {
   return applyDecorators(

@@ -1,15 +1,18 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { UserRole } from '../roles/role.enum';
 
 export class UserFilterDto {
-  @ApiProperty({ example: 'filter[name]=john', description: 'filter by name' })
+  @ApiPropertyOptional({
+    example: 'filter[name]=john',
+    description: 'filter by name',
+  })
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
   name: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'filter[surname]=johns',
     description: 'filter by surname',
   })
@@ -17,7 +20,7 @@ export class UserFilterDto {
   @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
   surname: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'filter[role]=admin',
     description: 'filter by role',
     enum: UserRole,
@@ -29,7 +32,7 @@ export class UserFilterDto {
   })
   role: UserRole;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'filter[phone]=069747583',
     description: 'filter by phone number',
   })

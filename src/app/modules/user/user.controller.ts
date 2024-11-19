@@ -66,7 +66,7 @@ export class UserController {
   @QueryApiOperation('page', 'number', 'page number')
   @QueryApiOperation('sortOrder', 'enum', 'sort order')
   @QueryApiOperation('sortColumn', 'enum', 'sort column')
-  @QueryApiOperation('filter', 'Object', 'filters users')
+  @QueryApiOperation('filter', UserFilterDto, 'filters users')
   @ApiResponse({ status: 200, description: 'Return list of users' })
   @ApiResponse({
     status: 500,
