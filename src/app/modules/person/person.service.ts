@@ -4,19 +4,20 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePersonDto } from './dto/create-person.dto';
-import { UpdatePersonDto } from './dto/update-person.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Person } from './entities/person.entity';
-import { Repository, SelectQueryBuilder } from 'typeorm';
-import { I18nService } from 'nestjs-i18n';
 import { translateMessage } from 'app/utils/translateMessage';
-import { PersonResponseDto } from './dto/person-response.dto';
 import { SortOrder } from 'database/validators/typeorm.sort.validator';
-import { PersonSort } from './validators/person.sort.validator';
+import { I18nService } from 'nestjs-i18n';
 import { paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { PersonItemDto } from './dto/person-item.dto';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PersonFilterBuilder } from './builders/person.filter.builder';
+import { CreatePersonDto } from './dto/create-person.dto';
+import { PersonFilterDto } from './dto/person-filter.dto';
+import { PersonItemDto } from './dto/person-item.dto';
+import { PersonResponseDto } from './dto/person-response.dto';
+import { UpdatePersonDto } from './dto/update-person.dto';
+import { Person } from './entities/person.entity';
+import { PersonSort } from './validators/person.sort.validator';
 
 @Injectable()
 export class PersonService {
@@ -55,7 +56,7 @@ export class PersonService {
     page?: number,
     sortOrder?: SortOrder,
     sortColumn?: PersonSort,
-    filter?: Record<string, any>,
+    filter?: PersonFilterDto,
   ): Promise<Pagination<PersonItemDto>> {
     try {
       const filterBuilder: PersonFilterBuilder = new PersonFilterBuilder(

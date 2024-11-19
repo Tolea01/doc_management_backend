@@ -1,36 +1,37 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
+  Controller,
   DefaultValuePipe,
+  Delete,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { PersonService } from './person.service';
-import { CreatePersonDto } from './dto/create-person.dto';
-import { UpdatePersonDto } from './dto/update-person.dto';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ApiLanguageHeader } from 'app/common/decorators/swagger/language-header';
-import { UserRole } from '../user/roles/role.enum';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
-import { PersonResponseDto } from './dto/person-response.dto';
+import { ApiLanguageHeader } from 'app/common/decorators/swagger/language-header';
 import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
+import { Pagination } from 'nestjs-typeorm-paginate';
 import paginationConfig from 'src/config/pagination.config';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
-import { PersonSort } from './validators/person.sort.validator';
-import { Pagination } from 'nestjs-typeorm-paginate';
+import { UserRole } from '../user/roles/role.enum';
+import { CreatePersonDto } from './dto/create-person.dto';
+import { PersonFilterDto } from './dto/person-filter.dto';
 import { PersonItemDto } from './dto/person-item.dto';
+import { PersonResponseDto } from './dto/person-response.dto';
+import { UpdatePersonDto } from './dto/update-person.dto';
 import { Person } from './entities/person.entity';
+import { PersonService } from './person.service';
+import { PersonSort } from './validators/person.sort.validator';
 
 @ApiTags('Persons')
 @ApiLanguageHeader()
@@ -68,7 +69,7 @@ export class PersonController {
   @QueryApiOperation('page', 'number', 'page number')
   @QueryApiOperation('sortOrder', 'enum', 'sort order')
   @QueryApiOperation('sortColumn', 'enum', 'sort column')
-  @QueryApiOperation('filter', 'Object', 'filters persons')
+  @QueryApiOperation('filter', PersonFilterDto, 'filters persons')
   @ApiResponse({ status: 200, description: 'Return list of persons' })
   @ApiResponse({
     status: 500,
@@ -83,7 +84,7 @@ export class PersonController {
     sortOrder: SortOrder,
     @Query('sortColumn', new DefaultValuePipe(paginationConfig.sortColumn))
     sortColumn: PersonSort,
-    @Query('filter') filter: Record<string, any>,
+    @Query('filter') filter: PersonFilterDto,
   ): Promise<Pagination<PersonItemDto>> {
     return this.personService.findAll(
       limit,
