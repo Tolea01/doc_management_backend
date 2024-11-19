@@ -15,8 +15,8 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { UserFilterBuilder } from './builders/user.filter.builder';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserFilterDto } from './dto/user-filter.dto';
 import { UserItemDto } from './dto/user-item.dto';
-import { UserFilterDto } from './dto/user.filter.dto';
 import { User } from './entities/user.entity';
 import { UserSort } from './validators/user.sort.validator';
 
