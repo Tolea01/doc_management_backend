@@ -20,6 +20,7 @@ import { Person } from '../person/entities/person.entity';
 import { User } from '../user/entities/user.entity';
 import { IncomingDocumentFilterBuilder } from './builders/incoming_document.filter.builder';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
+import { IncomingDocumentFilterDto } from './dto/incoming_document-filter.dto';
 import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
 import { IncomingDocument } from './entities/incoming_document.entity';
 import { IncomingDocumentSort } from './validators/incoming_document.sort.validator';
@@ -146,7 +147,7 @@ export class IncomingDocumentsService {
     page?: number,
     sortOrder?: SortOrder,
     sortColumn?: IncomingDocumentSort,
-    filter?: Record<string, any>,
+    filter?: IncomingDocumentFilterDto,
   ): Promise<Pagination<IncomingDocument>> {
     try {
       const filterBuilder: IncomingDocumentFilterBuilder =

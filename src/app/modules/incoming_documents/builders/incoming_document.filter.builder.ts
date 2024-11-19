@@ -9,7 +9,6 @@ export class IncomingDocumentFilterBuilder {
       'received',
       'initial_date',
       'date',
-      'executor',
       'execution_time',
       'location',
     ];
