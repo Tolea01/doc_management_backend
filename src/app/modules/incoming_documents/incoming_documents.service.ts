@@ -173,6 +173,39 @@ export class IncomingDocumentsService {
     }
   }
 
+  async findByExecutor(id: number): Promise<IncomingDocument[]> {
+    try {
+      const executor: User | undefined = await this.userRepository.findOne({
+        where: { id },
+      });
+
+      if (!executor) {
+        throw new NotFoundException(
+          await translateMessage(this.i18n, 'error.user_not_found', { id }),
+        );
+      }
+
+      const documents: IncomingDocument[] =
+        await this.incomingDocumentRepository
+          .createQueryBuilder('incoming_document')
+          .innerJoinAndSelect(
+            'incoming_document.executors',
+            'executor',
+            'executor.id = :id',
+            { id },
+          )
+          .getMany();
+
+      return documents;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.fetch_documents_failed', {
+          error: error.message,
+        }),
+      );
+    }
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} incomingDocument`;
   }

@@ -141,6 +141,15 @@ export class IncomingDocumentsController {
     );
   }
 
+  @Get('executor/:id')
+  @ApiOperation({ summary: 'Get document by executor' })
+  @ApiResponse({ status: 200, description: 'User has been found' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async getDocumentByExecutor(@Param('id', ParseIntPipe) id: number) {
+    return this.incomingDocumentsService.findByExecutor(id);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.incomingDocumentsService.findOne(+id);
