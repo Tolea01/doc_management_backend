@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
-import { IncomingDocumentsService } from './incoming_documents.service';
-import { IncomingDocumentsController } from './incoming_documents.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PersonModule } from '../person/person.module';
+import { UserModule } from '../user/user.module';
 import { IncomingDocument } from './entities/incoming_document.entity';
-import { User } from '../user/entities/user.entity';
-import { Person } from '../person/entities/person.entity';
+import { IncomingDocumentsController } from './incoming_documents.controller';
+import { IncomingDocumentsService } from './incoming_documents.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([IncomingDocument, User, Person])],
+  imports: [
+    TypeOrmModule.forFeature([IncomingDocument]),
+    UserModule,
+    PersonModule,
+  ],
   controllers: [IncomingDocumentsController],
   providers: [IncomingDocumentsService],
 })

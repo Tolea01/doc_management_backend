@@ -11,7 +11,7 @@ import { plainToInstance } from 'class-transformer';
 import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { I18nService } from 'nestjs-i18n';
 import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { UserFilterBuilder } from './builders/user.filter.builder';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -109,7 +109,7 @@ export class UserService {
 
   async findOneByEmail(email: string): Promise<User | undefined> {
     try {
-      const user: User = await this.userRepository.findOneOrFail({
+      const user: User | undefined = await this.userRepository.findOneOrFail({
         where: { email_address: email },
       });
 
@@ -118,6 +118,23 @@ export class UserService {
       throw new NotFoundException(
         await translateMessage(this.i18n, 'error.user_not_found', {
           email,
+          error: error.message,
+        }),
+      );
+    }
+  }
+
+  async findByIds(ids: number[]): Promise<User[]> {
+    try {
+      const users: User[] | undefined = await this.userRepository.findBy({
+        id: In(ids),
+      });
+
+      return users;
+    } catch (error) {
+      throw new NotFoundException(
+        await translateMessage(this.i18n, 'error.user_not_found', {
+          id: ids,
           error: error.message,
         }),
       );

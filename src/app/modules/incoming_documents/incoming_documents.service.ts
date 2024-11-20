@@ -14,10 +14,13 @@ import { I18nService } from 'nestjs-i18n';
 import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { resolve } from 'path';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ReadStream } from 'typeorm/platform/PlatformTools';
 import { Person } from '../person/entities/person.entity';
+import { PersonService } from '../person/person.service';
+import { UserItemDto } from '../user/dto/user-item.dto';
 import { User } from '../user/entities/user.entity';
+import { UserService } from '../user/user.service';
 import { IncomingDocumentFilterBuilder } from './builders/incoming_document.filter.builder';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
 import { IncomingDocumentFilterDto } from './dto/incoming_document-filter.dto';
@@ -30,10 +33,8 @@ export class IncomingDocumentsService {
   constructor(
     @InjectRepository(IncomingDocument)
     private readonly incomingDocumentRepository: Repository<IncomingDocument>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Person)
-    private readonly personRepository: Repository<Person>,
+    private readonly userService: UserService,
+    private readonly personService: PersonService,
     private readonly i18n: I18nService,
     private readonly configService: ConfigService,
   ) {}
@@ -92,16 +93,12 @@ export class IncomingDocumentsService {
     try {
       const { sender, received, ...rest } = incomingDocumentDto;
       const senderPerson: Person | undefined =
-        await this.personRepository.findOne({
-          where: { id: sender },
-        });
+        await this.personService.findOne(sender);
       const receivedPerson: Person | undefined =
-        await this.personRepository.findOne({
-          where: { id: received },
-        });
-      const executors: User[] = await this.userRepository.findBy({
-        id: In(incomingDocumentDto.executors),
-      });
+        await this.personService.findOne(received);
+      const executors: User[] | undefined = await this.userService.findByIds(
+        incomingDocumentDto.executors,
+      );
       const existDocument: IncomingDocument | undefined =
         await this.incomingDocumentRepository.findOne({
           where: { initial_number: incomingDocumentDto.initial_number },
@@ -177,9 +174,8 @@ export class IncomingDocumentsService {
 
   async findByExecutor(id: number): Promise<IncomingDocument[]> {
     try {
-      const executor: User | undefined = await this.userRepository.findOne({
-        where: { id },
-      });
+      const executor: UserItemDto | undefined =
+        await this.userService.findOne(id);
 
       if (!executor) {
         throw new NotFoundException(
