@@ -1,21 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UserService } from '../user/user.service';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { UserRegisterPayloadDto } from './dto/user.register.payload.dto';
-import { UserRegisterResponseDto } from './dto/user-register.response.dto';
+import { IJwtUserPayload } from 'app/common/interfaces/jwt-user-payload.interface';
+import { IRefreshTokenCookie } from 'app/common/interfaces/refresh-token-cookie.interface';
+import { translateMessage } from 'app/utils/translateMessage';
+import { verify } from 'argon2';
+import { Response } from 'express';
+import { I18nService } from 'nestjs-i18n';
+import { UserItemDto } from '../user/dto/user-item.dto';
+import { UserService } from '../user/user.service';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { TokenResponseDto } from './dto/tokens.response.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
-import { verify } from 'argon2';
-import { User } from '../user/entities/user.entity';
-import { I18nService } from 'nestjs-i18n';
-import { translateMessage } from 'app/utils/translateMessage';
-import { ConfigService } from '@nestjs/config';
-import { UserItemDto } from '../user/dto/user-item.dto';
-import { IJwtUserPayload } from 'app/common/interfaces/jwt-user-payload.interface';
-import { TokenResponseDto } from './dto/tokens.response.dto';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { Response } from 'express';
-import { IRefreshTokenCookie } from 'app/common/interfaces/refresh-token-cookie.interface';
+import { UserRegisterResponseDto } from './dto/user-register.response.dto';
+import { UserRegisterPayloadDto } from './dto/user.register.payload.dto';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +33,7 @@ export class AuthService {
 
   async login(userData: UserLoginPayloadDto): Promise<UserLoginResponseDto> {
     try {
-      const existingUser: User | undefined =
+      const existingUser: UserItemDto | undefined =
         await this.userService.findOneByEmail(userData.email_address);
 
       const jwtPayload: IJwtUserPayload = {

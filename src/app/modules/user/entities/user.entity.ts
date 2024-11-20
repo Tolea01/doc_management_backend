@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany } from 'typeorm';
-import { UserRole } from '../roles/role.enum';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { IncomingDocument } from '../../incoming_documents/entities/incoming_document.entity';
+import { UserRole } from '../roles/role.enum';
 
 @Entity('users')
 export class User {
@@ -21,6 +21,7 @@ export class User {
 
   @Column({
     nullable: false,
+    select: false,
   })
   password: string;
 

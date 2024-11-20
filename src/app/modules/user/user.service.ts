@@ -107,13 +107,13 @@ export class UserService {
     }
   }
 
-  async findOneByEmail(email: string): Promise<User | undefined> {
+  async findOneByEmail(email: string): Promise<UserItemDto | undefined> {
     try {
       const user: User | undefined = await this.userRepository.findOneOrFail({
         where: { email_address: email },
       });
 
-      return user;
+      return plainToInstance(UserItemDto, user);
     } catch (error) {
       throw new NotFoundException(
         await translateMessage(this.i18n, 'error.user_not_found', {
@@ -124,13 +124,13 @@ export class UserService {
     }
   }
 
-  async findByIds(ids: number[]): Promise<User[]> {
+  async findByIds(ids: number[]): Promise<UserItemDto[]> {
     try {
-      const users: User[] | undefined = await this.userRepository.findBy({
+      const users: User[] = await this.userRepository.findBy({
         id: In(ids),
       });
 
-      return users;
+      return plainToInstance(UserItemDto, users);
     } catch (error) {
       throw new NotFoundException(
         await translateMessage(this.i18n, 'error.user_not_found', {

@@ -19,7 +19,6 @@ import { ReadStream } from 'typeorm/platform/PlatformTools';
 import { Person } from '../person/entities/person.entity';
 import { PersonService } from '../person/person.service';
 import { UserItemDto } from '../user/dto/user-item.dto';
-import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { IncomingDocumentFilterBuilder } from './builders/incoming_document.filter.builder';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
@@ -96,7 +95,7 @@ export class IncomingDocumentsService {
         await this.personService.findOne(sender);
       const receivedPerson: Person | undefined =
         await this.personService.findOne(received);
-      const executors: User[] | undefined = await this.userService.findByIds(
+      const executors = await this.userService.findByIds(
         incomingDocumentDto.executors,
       );
       const existDocument: IncomingDocument | undefined =
