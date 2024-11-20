@@ -54,7 +54,9 @@ export class IncomingDocumentsService {
       };
     } catch (error) {
       throw new InternalServerErrorException(
-        await translateMessage(this.i18n, 'error.server_error', { error }),
+        await translateMessage(this.i18n, 'error.server_error', {
+          error: error.message,
+        }),
       );
     }
   }
@@ -78,7 +80,7 @@ export class IncomingDocumentsService {
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.server_error', {
-          error,
+          error: error.message,
         }),
       );
     }
@@ -136,7 +138,7 @@ export class IncomingDocumentsService {
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.document_creation_failed', {
-          error,
+          error: error.message,
         }),
       );
     }
@@ -181,7 +183,9 @@ export class IncomingDocumentsService {
 
       if (!executor) {
         throw new NotFoundException(
-          await translateMessage(this.i18n, 'error.user_not_found', { id }),
+          await translateMessage(this.i18n, 'error.user_not_found', {
+            id,
+          }),
         );
       }
 
@@ -206,8 +210,23 @@ export class IncomingDocumentsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} incomingDocument`;
+  async findOne(id: number): Promise<IncomingDocument> {
+    try {
+      const document: IncomingDocument | undefined =
+        await this.incomingDocumentRepository.findOne({
+          where: { id },
+          relations: ['executors'],
+        });
+
+      return document;
+    } catch (error) {
+      throw new NotFoundException(
+        await translateMessage(this.i18n, 'error.document_not_found', {
+          error: error.message,
+          id,
+        }),
+      );
+    }
   }
 
   update(id: number, updateIncomingDocumentDto: UpdateIncomingDocumentDto) {

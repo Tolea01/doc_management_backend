@@ -19,5 +19,6 @@
   "document_creation_failed": "Crearea documentului a eșuat. {error}",
   "server_error": "Eroare de server. {error}",
   "file_not_found": "Fișierul nu a fost găsit",
-  "fetch_documents_failed": "Eșec la obținerea documentelor. {error}"
+  "fetch_documents_failed": "Eșec la obținerea documentelor. {error}",
+  "document_not_found": "Documentul cu id {id} nu a fost găsit. {error}"
 }

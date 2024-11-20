@@ -151,8 +151,12 @@ export class IncomingDocumentsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    return this.incomingDocumentsService.findOne(+id);
+  @ApiOperation({ summary: 'Get document by id' })
+  @ApiResponse({ status: 200, description: 'Document has been found' })
+  @ApiResponse({ status: 404, description: 'Document not found' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.incomingDocumentsService.findOne(id);
   }
 
   @Patch(':id')
