@@ -19,6 +19,7 @@ import { ReadStream } from 'typeorm/platform/PlatformTools';
 import { Person } from '../person/entities/person.entity';
 import { PersonService } from '../person/person.service';
 import { UserItemDto } from '../user/dto/user-item.dto';
+import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { IncomingDocumentFilterBuilder } from './builders/incoming_document.filter.builder';
 import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
@@ -224,8 +225,48 @@ export class IncomingDocumentsService {
     }
   }
 
-  update(id: number, updateIncomingDocumentDto: UpdateIncomingDocumentDto) {
-    return `This action updates a #${id} incomingDocument`;
+  async update(
+    id: number,
+    updateIncomingDocumentDto: UpdateIncomingDocumentDto,
+  ): Promise<UpdateIncomingDocumentDto> {
+    try {
+      const document: IncomingDocument | undefined = await this.findOne(id);
+      const { sender, received, executors, ...rest } =
+        updateIncomingDocumentDto;
+
+      if (sender) {
+        document.sender = await this.personService.findOne(sender);
+      }
+
+      if (received) {
+        document.received = await this.personService.findOne(received);
+      }
+
+      if (executors) {
+        document.executors = (await this.userService.findByIds(
+          executors,
+        )) as User[];
+      }
+
+      Object.assign(document, rest);
+
+      await this.incomingDocumentRepository.save(document);
+
+      return {
+        ...rest,
+        sender: document.sender ? Number(document.sender.id) : undefined,
+        received: document.received ? Number(document.received.id) : undefined,
+        executors: executors
+          ? document.executors.map((user) => Number(user.id))
+          : undefined,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.server_error', {
+          error: error.message,
+        }),
+      );
+    }
   }
 
   remove(id: number) {

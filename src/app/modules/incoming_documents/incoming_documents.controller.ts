@@ -160,11 +160,19 @@ export class IncomingDocumentsController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Update document by id',
+    // description: 'Requires ADMIN role to update a user by ID',
+  })
+  @ApiOperation({ summary: 'Update document by id' })
+  @ApiResponse({ status: 200, description: 'Document has been updated' })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 500, description: 'Server error' })
   async update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateIncomingDocumentDto: UpdateIncomingDocumentDto,
   ) {
-    return this.incomingDocumentsService.update(+id, updateIncomingDocumentDto);
+    return this.incomingDocumentsService.update(id, updateIncomingDocumentDto);
   }
 
   @Delete(':id')
