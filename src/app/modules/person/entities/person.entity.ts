@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { IncomingDocument } from 'app/modules/incoming_documents/entities/incoming_document.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { PersonType } from '../types/type.enum';
 
 @Entity('persons')
@@ -29,4 +30,16 @@ export class Person {
     nullable: false,
   })
   email_address: string;
+
+  @OneToMany(
+    () => IncomingDocument,
+    (document: IncomingDocument) => document.sender,
+  )
+  sentDocuments: IncomingDocument[];
+
+  @OneToMany(
+    () => IncomingDocument,
+    (document: IncomingDocument) => document.received,
+  )
+  receivedDocuments: IncomingDocument[];
 }

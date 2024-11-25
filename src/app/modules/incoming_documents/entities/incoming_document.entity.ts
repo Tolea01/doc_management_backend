@@ -28,12 +28,18 @@ export class IncomingDocument {
   })
   number: string;
 
-  @ManyToOne(() => Person, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'sender' })
+  @ManyToOne(() => Person, (person) => person.sentDocuments, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'sender_id' })
   sender: Person;
 
-  @ManyToOne(() => Person, { onDelete: 'SET NULL', onUpdate: 'CASCADE' })
-  @JoinColumn({ name: 'received' })
+  @ManyToOne(() => Person, (person) => person.receivedDocuments, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'received_id' })
   received: Person;
 
   @Column({ type: 'text', nullable: true })
