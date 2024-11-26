@@ -11,7 +11,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { translateMessage } from 'app/utils/translateMessage';
 import { createReadStream, existsSync } from 'fs';
 import { I18nService } from 'nestjs-i18n';
-import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { resolve } from 'path';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
 import { Repository, SelectQueryBuilder } from 'typeorm';
@@ -27,6 +26,7 @@ import { IncomingDocumentFilterDto } from './dto/incoming_document-filter.dto';
 import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
 import { IncomingDocument } from './entities/incoming_document.entity';
 import { IncomingDocumentSort } from './validators/incoming_document.sort.validator';
+import IPagination from 'app/common/interfaces/pagination.interface'
 
 @Injectable()
 export class IncomingDocumentsService {
@@ -147,22 +147,30 @@ export class IncomingDocumentsService {
     sortOrder?: SortOrder,
     sortColumn?: IncomingDocumentSort,
     filter?: IncomingDocumentFilterDto,
-  ): Promise<Pagination<IncomingDocument>> {
+  ): Promise<IPagination<IncomingDocument>> {
     try {
       const filterBuilder: IncomingDocumentFilterBuilder =
         new IncomingDocumentFilterBuilder(filter);
       const queryBuilder: SelectQueryBuilder<IncomingDocument> =
         this.incomingDocumentRepository
-          .createQueryBuilder('incoming_document')
+          .createQueryBuilder('document')
+          .leftJoinAndSelect('document.received', 'received')
+          .leftJoinAndSelect('document.executors', 'executors')
+          .leftJoinAndSelect('document.sender', 'sender')
           .where(filterBuilder.getFilter())
-          .orderBy(sortColumn, sortOrder)
-          .skip(page * limit)
+          .orderBy(`document.${sortColumn}`, sortOrder)
+          .skip((page - 1) * limit)
           .take(limit);
 
-      const result: Pagination<IncomingDocument, IPaginationMeta> =
-        await paginate<IncomingDocument>(queryBuilder, { limit, page });
+      const [data, total]: [IncomingDocument[], number] =
+        await queryBuilder.getManyAndCount();
 
-      return result;
+      return {
+        data,
+        total,
+        page,
+        limit,
+      };
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.fetch_documents_failed', {
