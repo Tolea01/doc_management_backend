@@ -24,16 +24,16 @@ export class IncomingDocumentFilterDto {
     description: 'filter by sender id',
   })
   @IsOptional()
-  @IsNumber({}, { message: i18nValidationMessage('validation.INVALID_NUMBER') })
-  sender: number;
+  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  sender: string;
 
   @ApiPropertyOptional({
     example: 'filter[received]=3',
     description: 'filter by received id',
   })
   @IsOptional()
-  @IsNumber({}, { message: i18nValidationMessage('validation.INVALID_NUMBER') })
-  received: number;
+  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
+  received: string;
 
   @ApiPropertyOptional({
     example: 'filter[initial_date]=2024-07-02',
