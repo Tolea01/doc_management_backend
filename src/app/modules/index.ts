@@ -1,6 +1,6 @@
-import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { EntryDocumentsModule } from './entry_documents/entry_documents.module';
 import { PersonModule } from './person/person.module';
-import { IncomingDocumentsModule } from './incoming_documents/incoming_documents.module';
+import { UserModule } from './user/user.module';
 
-export default [UserModule, AuthModule, PersonModule, IncomingDocumentsModule];
+export default [UserModule, AuthModule, PersonModule, EntryDocumentsModule];

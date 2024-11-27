@@ -9,17 +9,12 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { DocumentStatus } from '../status/status.enum';
 
-@Entity('incoming_documents')
-export class IncomingDocument {
+@Entity('entry_documents')
+export class EntryDocument {
   @PrimaryGeneratedColumn('increment')
   id: number;
-
-  @Column({
-    length: 55,
-    nullable: false,
-  })
-  initial_number: string;
 
   @Column({
     length: 55,
@@ -27,6 +22,25 @@ export class IncomingDocument {
     unique: true,
   })
   number: string;
+
+  @Column({
+    length: 55,
+    nullable: false,
+  })
+  entry_number: string;
+
+  @Column({ type: 'date' })
+  date: string;
+
+  @Column({ type: 'date' })
+  entry_date: string;
+
+  @Column({
+    type: 'enum',
+    enum: DocumentStatus,
+    default: DocumentStatus.IN_WORK,
+  })
+  status: DocumentStatus;
 
   @ManyToOne(() => Person, (person) => person.sentDocuments, {
     onDelete: 'SET NULL',
@@ -45,26 +59,28 @@ export class IncomingDocument {
   @Column({ type: 'text', nullable: true })
   comment?: string;
 
-  @Column({ type: 'date' })
-  initial_date: string;
-
-  @Column({ type: 'date' })
-  date: string;
+  @Column({ length: 55, nullable: false })
+  resolution: string;
 
   @Column({ type: 'date' })
   execution_time: string;
 
-  @Column({ length: 255 })
-  location: string;
+  @Column({ type: 'text' })
+  file_path: string;
 
-  @ManyToMany(() => User, (user: User) => user.incoming_documents, {
+  @ManyToMany(() => User, (user: User) => user.entry_documents_coordinators, {
+    onDelete: 'SET NULL',
+    onUpdate: 'CASCADE',
+  })
+  @JoinTable({ name: 'coordinators_entry_documents' })
+  coordinators: User[];
+
+  @ManyToMany(() => User, (user: User) => user.entry_documents_executors, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
   @JoinTable({
-    name: 'user_incoming_document',
-    joinColumn: { name: 'incoming_document_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+    name: 'executors_entry_documents',
   })
   executors: User[];
 }

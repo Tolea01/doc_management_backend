@@ -1,4 +1,4 @@
-import { IncomingDocument } from 'app/modules/incoming_documents/entities/incoming_document.entity';
+import { EntryDocument } from 'app/modules/entry_documents/entities/entry_document.entity';
 import { Exclude, Expose } from 'class-transformer';
 import { UserRole } from '../roles/role.enum';
 
@@ -21,5 +21,5 @@ export class UserItemDto {
 
   email_address: string;
 
-  incoming_documents?: IncomingDocument[];
+  entry_documents?: EntryDocument[];
 }

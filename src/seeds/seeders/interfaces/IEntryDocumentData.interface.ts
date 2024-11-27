@@ -1,4 +1,4 @@
-export default interface IIncomingDocumentData {
+export default interface IEntryDocumentData {
   initial_number: string;
   number: string;
   sender: number;

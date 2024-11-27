@@ -28,33 +28,31 @@ import AppConfig from 'src/config/app.config';
 import paginationConfig from 'src/config/pagination.config';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
 import { UserRole } from '../user/roles/role.enum';
-import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
-import { IncomingDocumentFilterDto } from './dto/incoming_document-filter.dto';
-import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
-import { IncomingDocumentsService } from './incoming_documents.service';
-import { IncomingDocumentSort } from './validators/incoming_document.sort.validator';
+import { CreateEntryDocumentDto } from './dto/create-entry_document.dto';
+import { EntryDocumentFilterDto } from './dto/entry_document-filter.dto';
+import { UpdateEntryDocumentDto } from './dto/update-entry_document.dto';
+import { EntryDocumentsService } from './entry_documents.service';
+import { EntryDocumentSort } from './validators/entry_document.sort.validator';
 
-@ApiTags('Incoming Documents')
+@ApiTags('Entry Documents')
 @ApiLanguageHeader()
 @ApiBearerAuth()
-@Controller('incoming-documents')
+@Controller('entry-documents')
 @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
-export class IncomingDocumentsController {
-  constructor(
-    private readonly incomingDocumentsService: IncomingDocumentsService,
-  ) {}
+export class EntryDocumentsController {
+  constructor(private readonly entryDocumentsService: EntryDocumentsService) {}
 
   @Post('upload')
   @UseInterceptors(
     FilesInterceptor(
       'files',
       15,
-      new AppConfig().getMulterOptions('INCOMING_DOCUMENTS_UPLOAD_DEST'),
+      new AppConfig().getMulterOptions('ENTRY_DOCUMENTS_UPLOAD_DEST'),
     ),
   )
   @HttpCode(200)
   @ApiOperation({
-    summary: 'Upload incoming documents',
+    summary: 'Upload entry documents',
     description: 'Requires DIRECTOR or SECRETARY role to upload a document',
   })
   @ApiResponse({
@@ -67,12 +65,12 @@ export class IncomingDocumentsController {
     @UploadedFiles()
     pdfFiles: Array<Express.Multer.File>,
   ) {
-    return this.incomingDocumentsService.saveFiles(pdfFiles);
+    return this.entryDocumentsService.saveFiles(pdfFiles);
   }
 
   @Post('create')
   @ApiOperation({
-    summary: 'Create a incoming document',
+    summary: 'Create a entry document',
     description: 'Requires DIRECTOR or SECRETARY role to upload a document',
   })
   @ApiResponse({
@@ -82,15 +80,15 @@ export class IncomingDocumentsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async create(
-    @Body() createIncomingDocumentDto: CreateIncomingDocumentDto,
-  ): Promise<CreateIncomingDocumentDto> {
-    return this.incomingDocumentsService.create(createIncomingDocumentDto);
+    @Body() createEntryDocumentDto: CreateEntryDocumentDto,
+  ): Promise<CreateEntryDocumentDto> {
+    return this.entryDocumentsService.create(createEntryDocumentDto);
   }
 
   @Get('download/:filename')
   @HttpCode(200)
   @ApiOperation({
-    summary: 'Download incoming documents',
+    summary: 'Download entry documents',
   })
   @ApiResponse({
     status: 200,
@@ -99,23 +97,23 @@ export class IncomingDocumentsController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async downloadFile(@Param('filename') filename: string) {
-    return this.incomingDocumentsService.downloadFile(filename);
+    return this.entryDocumentsService.downloadFile(filename);
   }
 
   @Get('list')
   @ApiOperation({
-    summary: 'Get a list of incoming documents',
+    summary: 'Get a list of entry documents',
     // description: 'Accessible by ALL users',
   })
-  @ParamApiOperation('incoming document')
+  @ParamApiOperation('entry document')
   @QueryApiOperation('limit', 'number', 'items per page')
   @QueryApiOperation('page', 'number', 'page number')
   @QueryApiOperation('sortOrder', 'enum', 'sort order')
   @QueryApiOperation('sortColumn', 'enum', 'sort column')
-  @QueryApiOperation('filter', IncomingDocumentFilterDto, 'filters documents')
+  @QueryApiOperation('filter', EntryDocumentFilterDto, 'filters documents')
   @ApiResponse({
     status: 200,
-    description: 'Return list of incoming documents',
+    description: 'Return list of entry documents',
   })
   @ApiResponse({
     status: 500,
@@ -129,10 +127,10 @@ export class IncomingDocumentsController {
     @Query('sortOrder', new DefaultValuePipe(paginationConfig.sortOrder))
     sortOrder: SortOrder,
     @Query('sortColumn', new DefaultValuePipe(paginationConfig.sortColumn))
-    sortColumn: IncomingDocumentSort,
-    @Query('filter') filter: IncomingDocumentFilterDto,
+    sortColumn: EntryDocumentSort,
+    @Query('filter') filter: EntryDocumentFilterDto,
   ) {
-    return this.incomingDocumentsService.findAll(
+    return this.entryDocumentsService.findAll(
       limit,
       page,
       sortOrder,
@@ -147,7 +145,7 @@ export class IncomingDocumentsController {
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async getDocumentByExecutor(@Param('id', ParseIntPipe) id: number) {
-    return this.incomingDocumentsService.findByExecutor(id);
+    return this.entryDocumentsService.findByExecutor(id);
   }
 
   @Get(':id')
@@ -156,7 +154,7 @@ export class IncomingDocumentsController {
   @ApiResponse({ status: 404, description: 'Document not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.incomingDocumentsService.findOne(id);
+    return this.entryDocumentsService.findOne(id);
   }
 
   @Patch(':id')
@@ -170,13 +168,13 @@ export class IncomingDocumentsController {
   @ApiResponse({ status: 500, description: 'Server error' })
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateIncomingDocumentDto: UpdateIncomingDocumentDto,
+    @Body() updateEntryDocumentDto: UpdateEntryDocumentDto,
   ) {
-    return this.incomingDocumentsService.update(id, updateIncomingDocumentDto);
+    return this.entryDocumentsService.update(id, updateEntryDocumentDto);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.incomingDocumentsService.remove(+id);
+    return this.entryDocumentsService.remove(+id);
   }
 }

@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { IncomingDocument } from '../../incoming_documents/entities/incoming_document.entity';
+import { EntryDocument } from '../../entry_documents/entities/entry_document.entity';
 import { UserRole } from '../roles/role.enum';
 
 @Entity('users')
@@ -52,12 +52,22 @@ export class User {
   email_address: string;
 
   @ManyToMany(
-    () => IncomingDocument,
-    (document: IncomingDocument) => document.executors,
+    () => EntryDocument,
+    (document: EntryDocument) => document.executors,
     {
       onDelete: 'SET NULL',
       onUpdate: 'CASCADE',
     },
   )
-  incoming_documents: IncomingDocument[];
+  entry_documents_executors: EntryDocument[];
+
+  @ManyToMany(
+    () => EntryDocument,
+    (document: EntryDocument) => document.coordinators,
+    {
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    },
+  )
+  entry_documents_coordinators: EntryDocument[];
 }

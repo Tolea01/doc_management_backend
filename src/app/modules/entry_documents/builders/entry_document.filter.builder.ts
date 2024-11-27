@@ -1,16 +1,15 @@
 import { Equal } from 'typeorm';
 
-export class IncomingDocumentFilterBuilder {
+export class EntryDocumentFilterBuilder {
   constructor(private readonly filter: Record<string, any> = {}) {
     const filterOptions: string[] = [
-      'initial_number',
+      'entry_number',
       'number',
       'sender',
       'received',
       'initial_date',
       'date',
       'execution_time',
-      'location',
     ];
 
     for (const filterOption of filterOptions) {

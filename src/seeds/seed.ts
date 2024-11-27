@@ -1,6 +1,6 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { IncomingDocumentSeeder } from './seeders/incoming_document.seeder';
+import { EntryDocumentSeeder } from './seeders/entry_document.seeder';
 import { PersonSeeder } from './seeders/person.seeder';
 import { UserSeeder } from './seeders/user.seeder';
 import { SeedsModule } from './seeds.module';
@@ -11,9 +11,7 @@ async function runSeed(): Promise<void> {
 
   const userSeeder: UserSeeder = app.get(UserSeeder);
   const personSeeder: PersonSeeder = app.get(PersonSeeder);
-  const incomingDocumentSeeder: IncomingDocumentSeeder = app.get(
-    IncomingDocumentSeeder,
-  );
+  const entryDocumentSeeder: EntryDocumentSeeder = app.get(EntryDocumentSeeder);
 
   console.log('Seeding users...');
   await userSeeder.seed();
@@ -21,8 +19,8 @@ async function runSeed(): Promise<void> {
   console.log('Seeding persons...');
   await personSeeder.seed();
 
-  console.log('Seeding incoming documents...');
-  await incomingDocumentSeeder.seed();
+  console.log('Seeding entry documents...');
+  await entryDocumentSeeder.seed();
 
   await app.close();
 }

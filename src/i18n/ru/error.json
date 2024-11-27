@@ -15,7 +15,7 @@
   "delete_failed": "Не удалось удалить ресурс с ID {id}. {error}",
   "token_generation_failed": "Ошибка генерации токенов.",
   "document_already_exist": "Документ с номерои {initial_number} уже существует",
-  "sender_received_executor_not_found": "Отправитель, получатель или исполнитель не найдены",
+  "sender_received_executor_not_found": "Отправитель, получатель, исполнитель или координатор не найдены",
   "document_creation_failed": "Создание документа не удалось. {error}",
   "server_error": "ошибка сервера. {error}",
   "file_not_found": "Файл не найден",

@@ -21,18 +21,18 @@ import { PersonService } from '../person/person.service';
 import { UserItemDto } from '../user/dto/user-item.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
-import { IncomingDocumentFilterBuilder } from './builders/incoming_document.filter.builder';
-import { CreateIncomingDocumentDto } from './dto/create-incoming_document.dto';
-import { IncomingDocumentFilterDto } from './dto/incoming_document-filter.dto';
-import { UpdateIncomingDocumentDto } from './dto/update-incoming_document.dto';
-import { IncomingDocument } from './entities/incoming_document.entity';
-import { IncomingDocumentSort } from './validators/incoming_document.sort.validator';
+import { EntryDocumentFilterBuilder } from './builders/entry_document.filter.builder';
+import { CreateEntryDocumentDto } from './dto/create-entry_document.dto';
+import { EntryDocumentFilterDto } from './dto/entry_document-filter.dto';
+import { UpdateEntryDocumentDto } from './dto/update-entry_document.dto';
+import { EntryDocument } from './entities/entry_document.entity';
+import { EntryDocumentSort } from './validators/entry_document.sort.validator';
 
 @Injectable()
-export class IncomingDocumentsService {
+export class EntryDocumentsService {
   constructor(
-    @InjectRepository(IncomingDocument)
-    private readonly incomingDocumentRepository: Repository<IncomingDocument>,
+    @InjectRepository(EntryDocument)
+    private readonly entryDocumentRepository: Repository<EntryDocument>,
     private readonly userService: UserService,
     private readonly personService: PersonService,
     private readonly i18n: I18nService,
@@ -65,7 +65,7 @@ export class IncomingDocumentsService {
   async downloadFile(filename: string): Promise<StreamableFile> {
     try {
       const uploadPath: string = this.configService.get<string>(
-        'INCOMING_DOCUMENTS_UPLOAD_DEST',
+        'ENTRY_DOCUMENTS_UPLOAD_DEST',
       );
 
       const filePath: string = resolve(process.cwd(), uploadPath, filename);
@@ -88,23 +88,28 @@ export class IncomingDocumentsService {
   }
 
   async create(
-    incomingDocumentDto: CreateIncomingDocumentDto,
-  ): Promise<CreateIncomingDocumentDto> {
+    entryDocumentDto: CreateEntryDocumentDto,
+  ): Promise<CreateEntryDocumentDto> {
     try {
-      const { sender, received, ...rest } = incomingDocumentDto;
+      const { sender, received, ...rest } = entryDocumentDto;
+
       const senderPerson: Person | undefined =
         await this.personService.findOne(sender);
       const receivedPerson: Person | undefined =
         await this.personService.findOne(received);
       const executors = await this.userService.findByIds(
-        incomingDocumentDto.executors,
+        entryDocumentDto.executors,
       );
-      const existDocument: IncomingDocument | undefined =
-        await this.incomingDocumentRepository.findOne({
-          where: { initial_number: incomingDocumentDto.initial_number },
+      const coordinators = await this.userService.findByIds(
+        entryDocumentDto.coordinators,
+      );
+
+      const existDocument: EntryDocument | undefined =
+        await this.entryDocumentRepository.findOne({
+          where: { entry_number: entryDocumentDto.entry_number },
         });
 
-      if (!senderPerson || !receivedPerson || !executors) {
+      if (!senderPerson || !receivedPerson || !executors || !coordinators) {
         throw new NotFoundException(
           await translateMessage(
             this.i18n,
@@ -116,22 +121,22 @@ export class IncomingDocumentsService {
       if (existDocument) {
         throw new ConflictException(
           await translateMessage(this.i18n, 'error.document_already_exist', {
-            initial_number: existDocument.initial_number,
+            entry_number: existDocument.entry_number,
           }),
         );
       }
 
-      const newDocument: IncomingDocument =
-        this.incomingDocumentRepository.create({
-          ...rest,
-          received: receivedPerson,
-          sender: senderPerson,
-          executors,
-        });
+      const newDocument: EntryDocument = this.entryDocumentRepository.create({
+        ...rest,
+        received: receivedPerson,
+        sender: senderPerson,
+        executors,
+        coordinators,
+      });
 
-      await this.incomingDocumentRepository.save(newDocument);
+      await this.entryDocumentRepository.save(newDocument);
 
-      return incomingDocumentDto;
+      return entryDocumentDto;
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.document_creation_failed', {
@@ -145,24 +150,25 @@ export class IncomingDocumentsService {
     limit?: number,
     page?: number,
     sortOrder?: SortOrder,
-    sortColumn?: IncomingDocumentSort,
-    filter?: IncomingDocumentFilterDto,
-  ): Promise<IPagination<IncomingDocument>> {
+    sortColumn?: EntryDocumentSort,
+    filter?: EntryDocumentFilterDto,
+  ): Promise<IPagination<EntryDocument>> {
     try {
-      const filterBuilder: IncomingDocumentFilterBuilder =
-        new IncomingDocumentFilterBuilder(filter);
-      const queryBuilder: SelectQueryBuilder<IncomingDocument> =
-        this.incomingDocumentRepository
+      const filterBuilder: EntryDocumentFilterBuilder =
+        new EntryDocumentFilterBuilder(filter);
+      const queryBuilder: SelectQueryBuilder<EntryDocument> =
+        this.entryDocumentRepository
           .createQueryBuilder('document')
           .leftJoinAndSelect('document.received', 'received')
-          .leftJoinAndSelect('document.executors', 'executors')
           .leftJoinAndSelect('document.sender', 'sender')
+          .leftJoinAndSelect('document.executors', 'executors')
+          .leftJoinAndSelect('document.coordinators', 'coordinators')
           .where(filterBuilder.getFilter())
           .orderBy(`document.${sortColumn}`, sortOrder)
           .skip((page - 1) * limit)
           .take(limit);
 
-      const [data, total]: [IncomingDocument[], number] =
+      const [data, total]: [EntryDocument[], number] =
         await queryBuilder.getManyAndCount();
 
       return {
@@ -180,7 +186,7 @@ export class IncomingDocumentsService {
     }
   }
 
-  async findByExecutor(id: number): Promise<IncomingDocument[]> {
+  async findByExecutor(id: number): Promise<EntryDocument[]> {
     try {
       const executor: UserItemDto | undefined =
         await this.userService.findOne(id);
@@ -193,16 +199,15 @@ export class IncomingDocumentsService {
         );
       }
 
-      const documents: IncomingDocument[] =
-        await this.incomingDocumentRepository
-          .createQueryBuilder('incoming_document')
-          .innerJoinAndSelect(
-            'incoming_document.executors',
-            'executor',
-            'executor.id = :id',
-            { id },
-          )
-          .getMany();
+      const documents: EntryDocument[] = await this.entryDocumentRepository
+        .createQueryBuilder('document')
+        .innerJoinAndSelect(
+          'document.executors',
+          'executor',
+          'executor.id = :id',
+          { id },
+        )
+        .getMany();
 
       return documents;
     } catch (error) {
@@ -214,12 +219,12 @@ export class IncomingDocumentsService {
     }
   }
 
-  async findOne(id: number): Promise<IncomingDocument> {
+  async findOne(id: number): Promise<EntryDocument> {
     try {
-      const document: IncomingDocument | undefined =
-        await this.incomingDocumentRepository.findOne({
+      const document: EntryDocument | undefined =
+        await this.entryDocumentRepository.findOne({
           where: { id },
-          relations: ['executors'],
+          relations: ['executors', 'coordinators', 'sender', 'received'],
         });
 
       return document;
@@ -235,12 +240,12 @@ export class IncomingDocumentsService {
 
   async update(
     id: number,
-    updateIncomingDocumentDto: UpdateIncomingDocumentDto,
-  ): Promise<UpdateIncomingDocumentDto> {
+    updateEntryDocumentDto: UpdateEntryDocumentDto,
+  ): Promise<UpdateEntryDocumentDto> {
     try {
-      const document: IncomingDocument | undefined = await this.findOne(id);
-      const { sender, received, executors, ...rest } =
-        updateIncomingDocumentDto;
+      const document: EntryDocument | undefined = await this.findOne(id);
+      const { sender, received, executors, coordinators, ...rest } =
+        updateEntryDocumentDto;
 
       if (sender) {
         document.sender = await this.personService.findOne(sender);
@@ -256,9 +261,15 @@ export class IncomingDocumentsService {
         )) as User[];
       }
 
+      if (coordinators) {
+        document.coordinators = (await this.userService.findByIds(
+          coordinators,
+        )) as User[];
+      }
+
       Object.assign(document, rest);
 
-      await this.incomingDocumentRepository.save(document);
+      await this.entryDocumentRepository.save(document);
 
       return {
         ...rest,
@@ -266,6 +277,9 @@ export class IncomingDocumentsService {
         received: document.received ? Number(document.received.id) : undefined,
         executors: executors
           ? document.executors.map((user) => Number(user.id))
+          : undefined,
+        coordinators: coordinators
+          ? document.coordinators.map((user) => Number(user.id))
           : undefined,
       };
     } catch (error) {

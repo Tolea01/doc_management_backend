@@ -1,15 +1,15 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsISO8601, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsISO8601, IsOptional, IsString } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
-export class IncomingDocumentFilterDto {
+export class EntryDocumentFilterDto {
   @ApiPropertyOptional({
-    example: 'filter[initial_number]=mJkYfaF38t',
+    example: 'filter[entry_number]=mJkYfaF38t',
     description: 'filter by initial_number',
   })
   @IsOptional()
   @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  initial_number: string;
+  entry_number: string;
 
   @ApiPropertyOptional({
     example: 'filter[number]=uvTrD1Ri',
@@ -36,7 +36,7 @@ export class IncomingDocumentFilterDto {
   received: string;
 
   @ApiPropertyOptional({
-    example: 'filter[initial_date]=2024-07-02',
+    example: 'filter[entry_date]=2024-07-02',
     description: 'filter by initial_date',
   })
   @IsOptional()
@@ -44,7 +44,7 @@ export class IncomingDocumentFilterDto {
     {},
     { message: i18nValidationMessage('validation.INVALID_DATE_STRING') },
   )
-  initial_date: string;
+  entry_date: string;
 
   @ApiPropertyOptional({
     example: 'filter[date]=2024-07-02',
@@ -67,12 +67,4 @@ export class IncomingDocumentFilterDto {
     { message: i18nValidationMessage('validation.INVALID_DATE_STRING') },
   )
   execution_time: string;
-
-  @ApiPropertyOptional({
-    example: 'filter[location]=balti',
-    description: 'filter by location',
-  })
-  @IsOptional()
-  @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  location: string;
 }
