@@ -222,6 +222,42 @@ export class EntryDocumentsService {
     }
   }
 
+  async findByCoordinator(id: number): Promise<EntryDocument[]> {
+    try {
+      const coordinator: UserItemDto | undefined =
+        await this.userService.findOne(id);
+
+      if (!coordinator) {
+        throw new NotFoundException(
+          await translateMessage(this.i18n, 'error.user_not_found', {
+            id,
+          }),
+        );
+      }
+
+      const documents: EntryDocument[] = await this.entryDocumentRepository
+        .createQueryBuilder('document')
+        .innerJoinAndSelect(
+          'document.coordinators',
+          'coordinator',
+          'coordinator.id = :id',
+          { id },
+        )
+        .leftJoinAndSelect('document.sender', 'sender')
+        .leftJoinAndSelect('document.received', 'received')
+        .leftJoinAndSelect('document.executors', 'executors')
+        .getMany();
+
+      return documents;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.fetch_documents_failed', {
+          error: error.message,
+        }),
+      );
+    }
+  }
+
   async findOne(id: number): Promise<EntryDocument> {
     try {
       const document: EntryDocument | undefined =

@@ -141,11 +141,20 @@ export class EntryDocumentsController {
 
   @Get('executor/:id')
   @ApiOperation({ summary: 'Get document by executor' })
-  @ApiResponse({ status: 200, description: 'User has been found' })
-  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiResponse({ status: 200, description: 'Executor has been found' })
+  @ApiResponse({ status: 404, description: 'Executor not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async getDocumentByExecutor(@Param('id', ParseIntPipe) id: number) {
     return this.entryDocumentsService.findByExecutor(id);
+  }
+
+  @Get('coordinator/:id')
+  @ApiOperation({ summary: 'Get document by coordinator' })
+  @ApiResponse({ status: 200, description: 'Coordinator has been found' })
+  @ApiResponse({ status: 404, description: 'Coordinator not found' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async getDocumentByCoordinator(@Param('id', ParseIntPipe) id: number) {
+    return this.entryDocumentsService.findByCoordinator(id);
   }
 
   @Get(':id')
