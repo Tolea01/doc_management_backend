@@ -207,6 +207,9 @@ export class EntryDocumentsService {
           'executor.id = :id',
           { id },
         )
+        .leftJoinAndSelect('document.sender', 'sender')
+        .leftJoinAndSelect('document.received', 'received')
+        .leftJoinAndSelect('document.coordinators', 'coordinators')
         .getMany();
 
       return documents;
