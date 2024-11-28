@@ -69,14 +69,12 @@ export class EntryDocument {
   file_path: string;
 
   @ManyToMany(() => User, (user: User) => user.entry_documents_coordinators, {
-    onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
   @JoinTable({ name: 'coordinators_entry_documents' })
   coordinators: User[];
 
   @ManyToMany(() => User, (user: User) => user.entry_documents_executors, {
-    onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
   @JoinTable({

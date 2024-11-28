@@ -347,7 +347,16 @@ export class EntryDocumentsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} incomingDocument`;
+  async remove(id: number): Promise<void> {
+    try {
+      await this.entryDocumentRepository.delete(id);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.delete_failed', {
+          id,
+          error: error.message,
+        }),
+      );
+    }
   }
 }

@@ -199,7 +199,13 @@ export class EntryDocumentsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.entryDocumentsService.remove(+id);
+  @ApiOperation({
+    summary: 'Delete document by id',
+  })
+  @ApiOperation({ summary: 'Delete document by id' })
+  @ApiResponse({ status: 200, description: 'Document has been deleted' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.entryDocumentsService.remove(id);
   }
 }
