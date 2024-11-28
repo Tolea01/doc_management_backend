@@ -38,11 +38,11 @@ import { EntryDocumentSort } from './validators/entry_document.sort.validator';
 @ApiLanguageHeader()
 @ApiBearerAuth()
 @Controller('entry-documents')
-@Role(UserRole.DIRECTOR, UserRole.SECRETARY)
 export class EntryDocumentsController {
   constructor(private readonly entryDocumentsService: EntryDocumentsService) {}
 
   @Post('upload')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
   @UseInterceptors(
     FilesInterceptor(
       'files',
@@ -69,6 +69,7 @@ export class EntryDocumentsController {
   }
 
   @Get('download/:filename')
+  @Role(UserRole.ALL)
   @HttpCode(200)
   @ApiOperation({
     summary: 'Download entry documents',
@@ -84,10 +85,12 @@ export class EntryDocumentsController {
   }
 
   @Delete('delete-file/:filename')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY, UserRole.ADMIN)
   @HttpCode(200)
   @ApiOperation({
     summary: 'Delete file',
-    // description: 'Requires DIRECTOR or SECRETARY role to upload a document',
+    description:
+      'Requires DIRECTOR or SECRETARY or ADMIN role to upload a document',
   })
   @ApiResponse({
     status: 200,
@@ -100,6 +103,7 @@ export class EntryDocumentsController {
   }
 
   @Post('create')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
   @ApiOperation({
     summary: 'Create a entry document',
     description: 'Requires DIRECTOR or SECRETARY role to upload a document',
@@ -117,6 +121,7 @@ export class EntryDocumentsController {
   }
 
   @Get('list')
+  @Role(UserRole.ALL)
   @ApiOperation({
     summary: 'Get a list of entry documents',
     // description: 'Accessible by ALL users',
@@ -156,6 +161,7 @@ export class EntryDocumentsController {
   }
 
   @Get('executor/:id')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
   @ApiOperation({ summary: 'Get document by executor' })
   @ApiResponse({ status: 200, description: 'Executor has been found' })
   @ApiResponse({ status: 404, description: 'Executor not found' })
@@ -165,6 +171,7 @@ export class EntryDocumentsController {
   }
 
   @Get('coordinator/:id')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
   @ApiOperation({ summary: 'Get document by coordinator' })
   @ApiResponse({ status: 200, description: 'Coordinator has been found' })
   @ApiResponse({ status: 404, description: 'Coordinator not found' })
@@ -174,6 +181,7 @@ export class EntryDocumentsController {
   }
 
   @Get(':id')
+  @Role(UserRole.ALL)
   @ApiOperation({ summary: 'Get document by id' })
   @ApiResponse({ status: 200, description: 'Document has been found' })
   @ApiResponse({ status: 404, description: 'Document not found' })
@@ -183,9 +191,9 @@ export class EntryDocumentsController {
   }
 
   @Patch(':id')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY, UserRole.ADMIN)
   @ApiOperation({
     summary: 'Update document by id',
-    // description: 'Requires ADMIN role to update a user by ID',
   })
   @ApiOperation({ summary: 'Update document by id' })
   @ApiResponse({ status: 200, description: 'Document has been updated' })
@@ -199,6 +207,7 @@ export class EntryDocumentsController {
   }
 
   @Delete(':id')
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY, UserRole.ADMIN)
   @ApiOperation({
     summary: 'Delete document by id',
   })
