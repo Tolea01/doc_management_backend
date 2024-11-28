@@ -124,7 +124,7 @@ export class EntryDocumentsController {
   @Role(UserRole.ALL)
   @ApiOperation({
     summary: 'Get a list of entry documents',
-    // description: 'Accessible by ALL users',
+    description: 'Accessible by ALL users',
   })
   @ParamApiOperation('entry document')
   @QueryApiOperation('limit', 'number', 'items per page')
