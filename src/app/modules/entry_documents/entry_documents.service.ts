@@ -6,16 +6,13 @@ import {
   NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import IPagination from 'app/common/interfaces/pagination.interface';
 import { translateMessage } from 'app/utils/translateMessage';
-import { createReadStream, existsSync } from 'fs';
 import { I18nService } from 'nestjs-i18n';
-import { resolve } from 'path';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { ReadStream } from 'typeorm/platform/PlatformTools';
+import { FileManagementService } from '../file_management/file_management.service';
 import { Person } from '../person/entities/person.entity';
 import { PersonService } from '../person/person.service';
 import { UserItemDto } from '../user/dto/user-item.dto';
@@ -36,14 +33,13 @@ export class EntryDocumentsService {
     private readonly userService: UserService,
     private readonly personService: PersonService,
     private readonly i18n: I18nService,
-    private readonly configService: ConfigService,
+    private readonly fileManagementService: FileManagementService,
   ) {}
 
   async saveFiles(pdfFiles: Array<Express.Multer.File>) {
     try {
-      const filesName: string[] = pdfFiles.map((file) => file.filename);
-
-      if (!pdfFiles || !filesName.length) {
+      const filenames = this.fileManagementService.getFileNames(pdfFiles);
+      if (!filenames || filenames.length === 0) {
         throw new BadRequestException(
           await translateMessage(this.i18n, 'validation.INVALID_PDF'),
         );
@@ -51,7 +47,7 @@ export class EntryDocumentsService {
 
       return {
         message: await translateMessage(this.i18n, 'message.UPLOAD_SUCCESS'),
-        filenames: filesName,
+        filenames: filenames,
       };
     } catch (error) {
       throw new InternalServerErrorException(
@@ -62,22 +58,43 @@ export class EntryDocumentsService {
     }
   }
 
-  async downloadFile(filename: string): Promise<StreamableFile> {
+  async downloadFile(fileName: string): Promise<StreamableFile> {
     try {
-      const uploadPath: string = this.configService.get<string>(
-        'ENTRY_DOCUMENTS_UPLOAD_DEST',
-      );
+      const filePath: string | null =
+        this.fileManagementService.getFilePath(fileName);
 
-      const filePath: string = resolve(process.cwd(), uploadPath, filename);
-
-      if (!existsSync(filePath)) {
+      if (!filePath) {
         throw new NotFoundException(
           await translateMessage(this.i18n, 'message.FILE_NOT_FOUND'),
         );
       }
 
-      const fileStream: ReadStream = createReadStream(filePath);
-      return new StreamableFile(fileStream);
+      return this.fileManagementService.download(fileName);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        await translateMessage(this.i18n, 'error.server_error', {
+          error: error.message,
+        }),
+      );
+    }
+  }
+
+  async deleteFile(fileName: string) {
+    try {
+      const filePath: string | null =
+        this.fileManagementService.getFilePath(fileName);
+
+      if (!filePath) {
+        throw new NotFoundException(
+          await translateMessage(this.i18n, 'message.FILE_NOT_FOUND'),
+        );
+      }
+
+      this.fileManagementService.delete(filePath);
+
+      return {
+        message: await translateMessage(this.i18n, 'message.DELETE_SUCCESS'),
+      };
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.server_error', {

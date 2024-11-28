@@ -68,6 +68,37 @@ export class EntryDocumentsController {
     return this.entryDocumentsService.saveFiles(pdfFiles);
   }
 
+  @Get('download/:filename')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Download entry documents',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The documents has been successfully downloaded',
+  })
+  @ApiResponse({ status: 404, description: 'File not found' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async downloadFile(@Param('filename') filename: string) {
+    return this.entryDocumentsService.downloadFile(filename);
+  }
+
+  @Delete('delete-file/:filename')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Delete file',
+    // description: 'Requires DIRECTOR or SECRETARY role to upload a document',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The file has been successfully deleted',
+  })
+  @ApiResponse({ status: 404, description: 'File not found' })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  async deleteFile(@Param('filename') filename: string) {
+    return this.entryDocumentsService.deleteFile(filename);
+  }
+
   @Post('create')
   @ApiOperation({
     summary: 'Create a entry document',
@@ -83,21 +114,6 @@ export class EntryDocumentsController {
     @Body() createEntryDocumentDto: CreateEntryDocumentDto,
   ): Promise<CreateEntryDocumentDto> {
     return this.entryDocumentsService.create(createEntryDocumentDto);
-  }
-
-  @Get('download/:filename')
-  @HttpCode(200)
-  @ApiOperation({
-    summary: 'Download entry documents',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'The documents has been successfully downloaded',
-  })
-  @ApiResponse({ status: 400, description: 'Bad request' })
-  @ApiResponse({ status: 500, description: 'Server error' })
-  async downloadFile(@Param('filename') filename: string) {
-    return this.entryDocumentsService.downloadFile(filename);
   }
 
   @Get('list')
