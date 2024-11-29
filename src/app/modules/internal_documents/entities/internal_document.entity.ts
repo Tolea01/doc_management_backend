@@ -1,4 +1,4 @@
-import { DocumentStatus } from 'app/modules/entry_documents/status/status.enum';
+import { DocumentStatus } from 'app/common/enums/document-status.enum';
 import { User } from 'app/modules/user/entities/user.entity';
 import {
   Column,

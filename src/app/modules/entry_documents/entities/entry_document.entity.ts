@@ -9,7 +9,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { DocumentStatus } from '../status/status.enum';
+import { DocumentStatus } from 'app/common/enums/document-status.enum';
 
 @Entity('entry_documents')
 export class EntryDocument {
