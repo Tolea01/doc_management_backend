@@ -1,3 +1,4 @@
+import { InternalDocument } from 'app/modules/internal_documents/entities/internal_document.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { EntryDocument } from '../../entry_documents/entities/entry_document.entity';
 import { UserRole } from '../roles/role.enum';
@@ -70,4 +71,24 @@ export class User {
     },
   )
   entry_documents_coordinators: EntryDocument[];
+
+  @ManyToMany(
+    () => InternalDocument,
+    (document: InternalDocument) => document.executors,
+    {
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    },
+  )
+  internal_documents_executors: InternalDocument[];
+
+  @ManyToMany(
+    () => InternalDocument,
+    (document: InternalDocument) => document.coordinators,
+    {
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    },
+  )
+  internal_documents_coordinators: InternalDocument[];
 }
