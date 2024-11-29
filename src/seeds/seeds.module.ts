@@ -13,6 +13,7 @@ import {
 import AppConfig from 'src/config/app.config';
 import AllModules from '../app/modules';
 import { EntryDocumentSeeder } from './seeders/entry_document.seeder';
+import { InternalDocumentSeeder } from './seeders/internal_document.seeder';
 import { PersonSeeder } from './seeders/person.seeder';
 import { UserSeeder } from './seeders/user.seeder';
 
@@ -35,6 +36,11 @@ import { UserSeeder } from './seeders/user.seeder';
       inject: [ConfigService],
     }),
   ],
-  providers: [UserSeeder, PersonSeeder, EntryDocumentSeeder],
+  providers: [
+    UserSeeder,
+    PersonSeeder,
+    EntryDocumentSeeder,
+    InternalDocumentSeeder,
+  ],
 })
 export class SeedsModule {}

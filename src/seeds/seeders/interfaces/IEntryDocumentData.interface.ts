@@ -1,12 +1,14 @@
 export default interface IEntryDocumentData {
-  initial_number: string;
+  entry_number: string;
   number: string;
-  sender: number;
-  comment?: string;
-  received: number;
-  initial_date: string;
+  entry_date: string;
   date: string;
+  sender: number;
+  received: number;
+  comment: string;
+  resolution: string;
+  coordinators: number[];
   executors: number[];
   execution_time: string;
-  location: string;
+  file_path: string;
 }
