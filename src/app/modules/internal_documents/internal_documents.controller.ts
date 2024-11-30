@@ -27,6 +27,7 @@ import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation
 import AppConfig from 'src/config/app.config';
 import paginationConfig from 'src/config/pagination.config';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
+import { FileManagementService } from '../file_management/file_management.service';
 import { UserRole } from '../user/roles/role.enum';
 import { CreateInternalDocumentDto } from './dto/create-internal_document.dto';
 import { InternalDocumentFilterDto } from './dto/internal_document-filter.dto';
@@ -41,6 +42,7 @@ import { InternalDocumentSort } from './validators/internal_document.sort.valida
 export class InternalDocumentsController {
   constructor(
     private readonly internalDocumentsService: InternalDocumentsService,
+    private readonly fileManagementService: FileManagementService,
   ) {}
 
   @Post('upload')
@@ -67,7 +69,7 @@ export class InternalDocumentsController {
     @UploadedFiles()
     pdfFiles: Array<Express.Multer.File>,
   ) {
-    return this.internalDocumentsService.saveFiles(pdfFiles);
+    return this.fileManagementService.saveFiles(pdfFiles);
   }
 
   @Get('download/:filename')
@@ -83,7 +85,7 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async downloadFile(@Param('filename') filename: string) {
-    return this.internalDocumentsService.downloadFile(filename);
+    return this.fileManagementService.downloadFile(filename);
   }
 
   @Delete('delete-file/:filename')
@@ -101,7 +103,7 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async deleteFile(@Param('filename') filename: string) {
-    return this.internalDocumentsService.deleteFile(filename);
+    return this.fileManagementService.deleteFile(filename);
   }
 
   @Post('create')
