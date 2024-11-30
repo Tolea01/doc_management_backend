@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EntryDocument } from 'app/modules/entry_documents/entities/entry_document.entity';
+import { ExitDocument } from 'app/modules/exit_documents/entities/exit_document.entity';
 import { InternalDocument } from 'app/modules/internal_documents/entities/internal_document.entity';
 import { Person } from 'app/modules/person/entities/person.entity';
 import { User } from 'app/modules/user/entities/user.entity';
@@ -14,6 +15,7 @@ import {
 import AppConfig from 'src/config/app.config';
 import AllModules from '../app/modules';
 import { EntryDocumentSeeder } from './seeders/entry_document.seeder';
+import { ExitDocumentSeeder } from './seeders/exit_document.seeder';
 import { InternalDocumentSeeder } from './seeders/internal_document.seeder';
 import { PersonSeeder } from './seeders/person.seeder';
 import { UserSeeder } from './seeders/user.seeder';
@@ -26,7 +28,13 @@ import { UserSeeder } from './seeders/user.seeder';
       useFactory: () => new AppConfig().databaseConnection(),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([User, Person, EntryDocument, InternalDocument]),
+    TypeOrmModule.forFeature([
+      User,
+      Person,
+      EntryDocument,
+      InternalDocument,
+      ExitDocument,
+    ]),
     I18nModule.forRootAsync({
       useFactory: () => new AppConfig().getI18nConfig(),
       resolvers: [
@@ -42,6 +50,7 @@ import { UserSeeder } from './seeders/user.seeder';
     PersonSeeder,
     EntryDocumentSeeder,
     InternalDocumentSeeder,
+    ExitDocumentSeeder,
   ],
 })
 export class SeedsModule {}

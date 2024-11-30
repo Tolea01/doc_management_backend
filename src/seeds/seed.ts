@@ -1,6 +1,7 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { EntryDocumentSeeder } from './seeders/entry_document.seeder';
+import { ExitDocumentSeeder } from './seeders/exit_document.seeder';
 import { InternalDocumentSeeder } from './seeders/internal_document.seeder';
 import { PersonSeeder } from './seeders/person.seeder';
 import { UserSeeder } from './seeders/user.seeder';
@@ -16,6 +17,7 @@ async function runSeed(): Promise<void> {
   const internalDocumentSeeder: InternalDocumentSeeder = app.get(
     InternalDocumentSeeder,
   );
+  const exitDocumentSeeder: ExitDocumentSeeder = app.get(ExitDocumentSeeder);
 
   console.log('Seeding users...');
   await userSeeder.seed();
@@ -28,6 +30,9 @@ async function runSeed(): Promise<void> {
 
   console.log('Seeding internal documents...');
   await internalDocumentSeeder.seed();
+
+  console.log('Seeding exit documents...');
+  await exitDocumentSeeder.seed();
 
   await app.close();
 }
