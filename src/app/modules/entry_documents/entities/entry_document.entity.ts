@@ -1,3 +1,4 @@
+import { DocumentStatus } from 'app/common/enums/document-status.enum';
 import { Person } from 'app/modules/person/entities/person.entity';
 import { User } from 'app/modules/user/entities/user.entity';
 import {
@@ -9,7 +10,6 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { DocumentStatus } from 'app/common/enums/document-status.enum';
 
 @Entity('entry_documents')
 export class EntryDocument {
@@ -42,14 +42,14 @@ export class EntryDocument {
   })
   status: DocumentStatus;
 
-  @ManyToOne(() => Person, (person) => person.sentDocuments, {
+  @ManyToOne(() => Person, (person) => person.sender_entry_documents, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'sender_id' })
   sender: Person;
 
-  @ManyToOne(() => Person, (person) => person.receivedDocuments, {
+  @ManyToOne(() => Person, (person) => person.received_entry_documents, {
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })

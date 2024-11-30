@@ -1,3 +1,4 @@
+import { ExitDocument } from 'app/modules/exit_documents/entities/exit_document.entity';
 import { InternalDocument } from 'app/modules/internal_documents/entities/internal_document.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { EntryDocument } from '../../entry_documents/entities/entry_document.entity';
@@ -91,4 +92,14 @@ export class User {
     },
   )
   internal_documents_coordinators: InternalDocument[];
+
+  @ManyToMany(
+    () => ExitDocument,
+    (document: ExitDocument) => document.executors,
+    {
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE',
+    },
+  )
+  exit_documents_executors: ExitDocument[];
 }

@@ -1,4 +1,5 @@
 import { EntryDocument } from 'app/modules/entry_documents/entities/entry_document.entity';
+import { ExitDocument } from 'app/modules/exit_documents/entities/exit_document.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { PersonType } from '../types/type.enum';
 
@@ -32,11 +33,14 @@ export class Person {
   email_address: string;
 
   @OneToMany(() => EntryDocument, (document: EntryDocument) => document.sender)
-  sentDocuments: EntryDocument[];
+  sender_entry_documents: EntryDocument[];
 
   @OneToMany(
     () => EntryDocument,
     (document: EntryDocument) => document.received,
   )
-  receivedDocuments: EntryDocument[];
+  received_entry_documents: EntryDocument[];
+
+  @OneToMany(() => ExitDocument, (document: ExitDocument) => document.received)
+  received_exit_documents: ExitDocument[];
 }
