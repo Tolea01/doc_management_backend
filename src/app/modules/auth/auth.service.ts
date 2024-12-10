@@ -8,6 +8,7 @@ import { verify } from 'argon2';
 import { Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { UserItemDto } from '../user/dto/user-item.dto';
+import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokenResponseDto } from './dto/tokens.response.dto';
@@ -33,7 +34,7 @@ export class AuthService {
 
   async login(userData: UserLoginPayloadDto): Promise<UserLoginResponseDto> {
     try {
-      const existingUser: UserItemDto | undefined =
+      const existingUser: User | undefined =
         await this.userService.findOneByEmail(userData.email_address);
 
       const jwtPayload: IJwtUserPayload = {

@@ -107,13 +107,13 @@ export class UserService {
     }
   }
 
-  async findOneByEmail(email: string): Promise<UserItemDto | undefined> {
+  async findOneByEmail(email: string): Promise<User | undefined> {
     try {
       const user: User | undefined = await this.userRepository.findOneOrFail({
         where: { email_address: email },
       });
 
-      return plainToInstance(UserItemDto, user);
+      return user;
     } catch (error) {
       throw new NotFoundException(
         await translateMessage(this.i18n, 'error.user_not_found', {

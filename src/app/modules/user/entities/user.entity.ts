@@ -23,7 +23,6 @@ export class User {
 
   @Column({
     nullable: false,
-    select: false,
   })
   password: string;
 
