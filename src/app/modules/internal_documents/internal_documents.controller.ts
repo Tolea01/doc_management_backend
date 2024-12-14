@@ -25,6 +25,7 @@ import { Role } from 'app/common/decorators/auth/roles.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
+import { ExcludeUserPasswordInterceptor } from 'app/interceptors/exclude_user_password.interceptor';
 import { Request } from 'express';
 import AppConfig from 'src/config/app.config';
 import paginationConfig from 'src/config/pagination.config';
@@ -150,6 +151,7 @@ export class InternalDocumentsController {
     status: 500,
     description: 'Error when searching for parameters',
   })
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   async findAll(
     @Query('limit', new DefaultValuePipe(paginationConfig.limit), ParseIntPipe)
     limit: number,
@@ -176,6 +178,7 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 200, description: 'Executor has been found' })
   @ApiResponse({ status: 404, description: 'Executor not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   async getDocumentByExecutor(@Param('id', ParseIntPipe) id: number) {
     return this.internalDocumentsService.findByExecutor(id);
   }
@@ -186,6 +189,7 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 200, description: 'Coordinator has been found' })
   @ApiResponse({ status: 404, description: 'Coordinator not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   async getDocumentByCoordinator(@Param('id', ParseIntPipe) id: number) {
     return this.internalDocumentsService.findByCoordinator(id);
   }
@@ -196,6 +200,7 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 200, description: 'Document has been found' })
   @ApiResponse({ status: 404, description: 'Document not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
+  @UseInterceptors(ExcludeUserPasswordInterceptor)
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.internalDocumentsService.findOne(id);
   }
