@@ -2,7 +2,14 @@ import { Equal } from 'typeorm';
 
 export class UserFilterBuilder {
   constructor(private readonly filter: Record<string, any> = {}) {
-    const filterOptions: string[] = ['name', 'surname', 'role', 'phone'];
+    const filterOptions: string[] = [
+      'name',
+      'surname',
+      'role',
+      'phone',
+      'created_by',
+      'updated_by',
+    ];
 
     for (const filterOption of filterOptions) {
       if (filter && filter[filterOption] && filter[filterOption].Length) {

@@ -15,6 +15,28 @@ export class UserSeeder {
   ) {}
 
   async seed(): Promise<void> {
+    const adminUsers: User[] | undefined = await this.userRepository.find({
+      where: { role: UserRole.ADMIN },
+    });
+
+    if (adminUsers.length === 0) {
+      const defaultAdmin = await this.userRepository.save(
+        this.userRepository.create({
+          name: 'Default',
+          surname: 'Admin',
+          password: await hash('password'),
+          role: UserRole.ADMIN,
+          photo: faker.image.avatar(),
+          phone_number: faker.phone.number().slice(0, 15),
+          email_address: 'default.admin@example.com',
+        }),
+      );
+
+      adminUsers.push(defaultAdmin);
+    }
+
+    const randomAdmin = faker.helpers.arrayElement(adminUsers);
+
     const data: IUserData[] = await Promise.all(
       Array.from({ length: 20 }, async () => ({
         name: faker.person.firstName(),
@@ -24,6 +46,7 @@ export class UserSeeder {
         photo: faker.image.avatar(),
         phone_number: faker.phone.number().slice(0, 15),
         email_address: faker.internet.email(),
+        created_by: randomAdmin.id,
       })),
     );
 

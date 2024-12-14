@@ -34,6 +34,7 @@ export class EntryDocumentsService {
 
   async create(
     entryDocumentDto: CreateEntryDocumentDto,
+    user: any,
   ): Promise<CreateEntryDocumentDto> {
     try {
       const { sender, received, ...rest } = entryDocumentDto;
@@ -77,6 +78,7 @@ export class EntryDocumentsService {
         sender: senderPerson,
         executors,
         coordinators,
+        created_by: user.userId,
       });
 
       await this.entryDocumentRepository.save(newDocument);
@@ -225,6 +227,7 @@ export class EntryDocumentsService {
   async update(
     id: number,
     updateEntryDocumentDto: UpdateEntryDocumentDto,
+    user: any,
   ): Promise<UpdateEntryDocumentDto> {
     try {
       const document: EntryDocument | undefined = await this.findOne(id);
@@ -253,7 +256,11 @@ export class EntryDocumentsService {
 
       Object.assign(document, rest);
 
-      await this.entryDocumentRepository.save(document);
+      await this.entryDocumentRepository.save({
+        updated_by: user.userId,
+        updated_at: new Date(),
+        ...document,
+      });
 
       return {
         ...rest,

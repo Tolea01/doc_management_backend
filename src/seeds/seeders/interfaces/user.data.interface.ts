@@ -8,4 +8,5 @@ export default interface IUserData {
   photo: string;
   phone_number: string;
   email_address: string;
+  created_by: number;
 }

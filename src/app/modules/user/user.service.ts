@@ -5,12 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import IPagination from 'app/common/interfaces/pagination.interface';
 import { translateMessage } from 'app/utils/translateMessage';
 import * as argon2 from 'argon2';
 import { plainToInstance } from 'class-transformer';
 import { SortOrder } from 'database/validators/typeorm.sort.validator';
 import { I18nService } from 'nestjs-i18n';
-import { IPaginationMeta, paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { UserFilterBuilder } from './builders/user.filter.builder';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -22,12 +22,19 @@ import { UserSort } from './validators/user.sort.validator';
 
 @Injectable()
 export class UserService {
+  USER_RELATIONS = [
+    'entry_documents_executors',
+    'entry_documents_coordinators',
+    'internal_documents_executors',
+    'internal_documents_coordinators',
+    'exit_documents_executors',
+  ];
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly i18n: I18nService,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserItemDto> {
+  async create(createUserDto: CreateUserDto, user: any): Promise<UserItemDto> {
     try {
       const existUser: User | undefined = await this.userRepository.findOne({
         where: { email_address: createUserDto.email_address },
@@ -41,12 +48,13 @@ export class UserService {
         );
       }
 
-      const user: CreateUserDto = await this.userRepository.save({
+      const newUser: CreateUserDto = await this.userRepository.save({
         ...createUserDto,
+        created_by: user.userId,
         password: await argon2.hash(createUserDto.password),
       });
 
-      return plainToInstance(UserItemDto, user);
+      return plainToInstance(UserItemDto, newUser);
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.registration_failed', {
@@ -62,24 +70,44 @@ export class UserService {
     sortOrder?: SortOrder,
     sortColumn?: UserSort,
     filter?: UserFilterDto,
-  ): Promise<Pagination<UserItemDto>> {
+  ): Promise<IPagination<UserItemDto>> {
     try {
       const filterBuilder: UserFilterBuilder = new UserFilterBuilder(filter);
       const queryBuilder: SelectQueryBuilder<User> = this.userRepository
         .createQueryBuilder('users')
+        .leftJoinAndSelect(
+          'users.entry_documents_executors',
+          'entry_documents_executors',
+        )
+        .leftJoinAndSelect(
+          'users.entry_documents_coordinators',
+          'entry_documents_coordinators',
+        )
+        .leftJoinAndSelect(
+          'users.internal_documents_executors',
+          'internal_documents_executors',
+        )
+        .leftJoinAndSelect(
+          'users.internal_documents_coordinators',
+          'internal_documents_coordinators',
+        )
+        .leftJoinAndSelect(
+          'users.exit_documents_executors',
+          'exit_documents_executors',
+        )
         .where(filterBuilder.getFilter())
-        .orderBy(sortColumn, sortOrder)
-        .skip(page * limit)
+        .orderBy(`users.${sortColumn}`, sortOrder)
+        .skip((page - 1) * limit)
         .take(limit);
 
-      const result: Pagination<User, IPaginationMeta> = await paginate<User>(
-        queryBuilder,
-        { limit, page },
-      );
+      const [data, total]: [User[], number] =
+        await queryBuilder.getManyAndCount();
 
       return {
-        ...result,
-        items: plainToInstance(UserItemDto, result.items),
+        data: plainToInstance(UserItemDto, data),
+        total,
+        page,
+        limit,
       };
     } catch (error) {
       throw new InternalServerErrorException(
@@ -94,6 +122,7 @@ export class UserService {
     try {
       const user: User = await this.userRepository.findOneOrFail({
         where: { id },
+        relations: this.USER_RELATIONS,
       });
 
       return plainToInstance(UserItemDto, user);
@@ -126,8 +155,9 @@ export class UserService {
 
   async findByIds(ids: number[]): Promise<UserItemDto[]> {
     try {
-      const users: User[] = await this.userRepository.findBy({
-        id: In(ids),
+      const users: User[] = await this.userRepository.find({
+        where: { id: In(ids) },
+        relations: this.USER_RELATIONS,
       });
 
       return plainToInstance(UserItemDto, users);
@@ -144,6 +174,7 @@ export class UserService {
   async update(
     id: number,
     updateUserDto: UpdateUserDto,
+    user: any,
   ): Promise<UpdateUserDto> {
     try {
       await this.findOne(id);
@@ -152,7 +183,11 @@ export class UserService {
         updateUserDto.password = await argon2.hash(updateUserDto.password);
       }
 
-      await this.userRepository.update(id, updateUserDto);
+      await this.userRepository.update(id, {
+        updated_by: user.userId,
+        updated_at: new Date(),
+        ...updateUserDto,
+      });
 
       return {
         ...updateUserDto,

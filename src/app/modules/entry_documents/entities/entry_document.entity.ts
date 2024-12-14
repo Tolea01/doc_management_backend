@@ -16,6 +16,26 @@ export class EntryDocument {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  @Column({ nullable: true })
+  created_by: number;
+
+  @Column({ nullable: true })
+  updated_by: number;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  updated_at: Date;
+
   @Column({
     length: 55,
     nullable: false,
@@ -43,14 +63,14 @@ export class EntryDocument {
   status: DocumentStatus;
 
   @ManyToOne(() => Person, (person) => person.sender_entry_documents, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'sender_id' })
   sender: Person;
 
   @ManyToOne(() => Person, (person) => person.received_entry_documents, {
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'received_id' })
@@ -70,12 +90,14 @@ export class EntryDocument {
 
   @ManyToMany(() => User, (user: User) => user.entry_documents_coordinators, {
     onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   @JoinTable({ name: 'coordinators_entry_documents' })
   coordinators: User[];
 
   @ManyToMany(() => User, (user: User) => user.entry_documents_executors, {
     onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   @JoinTable({
     name: 'executors_entry_documents',

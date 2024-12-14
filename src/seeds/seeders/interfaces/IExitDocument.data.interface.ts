@@ -9,4 +9,5 @@ export default interface IExitDocumentData {
   execution_time: string;
   executors: User[];
   file_path: string;
+  created_by: number;
 }

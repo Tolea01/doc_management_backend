@@ -9,6 +9,26 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  created_by: number;
+
+  @Column({ nullable: true })
+  updated_by: number;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  updated_at: Date;
+
   @Column({
     length: 60,
     nullable: false,
@@ -56,7 +76,7 @@ export class User {
     () => EntryDocument,
     (document: EntryDocument) => document.executors,
     {
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
   )
@@ -66,7 +86,7 @@ export class User {
     () => EntryDocument,
     (document: EntryDocument) => document.coordinators,
     {
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
   )
@@ -76,7 +96,7 @@ export class User {
     () => InternalDocument,
     (document: InternalDocument) => document.executors,
     {
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
   )
@@ -86,7 +106,7 @@ export class User {
     () => InternalDocument,
     (document: InternalDocument) => document.coordinators,
     {
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
   )
@@ -96,7 +116,7 @@ export class User {
     () => ExitDocument,
     (document: ExitDocument) => document.executors,
     {
-      onDelete: 'SET NULL',
+      onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     },
   )

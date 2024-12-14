@@ -59,6 +59,7 @@ export class EntryDocumentSeeder {
           executors,
           execution_time: faker.date.future().toISOString(),
           file_path: `${this.configService.get<string>('ENTRY_DOCUMENTS_UPLOAD_DEST')}/${faker.string.alphanumeric(10)}.pdf`,
+          created_by: faker.number.int({ min: 1, max: 5 }),
         };
       },
     );

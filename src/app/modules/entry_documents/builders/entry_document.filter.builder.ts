@@ -10,6 +10,8 @@ export class EntryDocumentFilterBuilder {
       'initial_date',
       'date',
       'execution_time',
+      'created_by',
+      'updated_by',
     ];
 
     for (const filterOption of filterOptions) {

@@ -13,6 +13,26 @@ export class InternalDocument {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  @Column({ nullable: true })
+  created_by: number;
+
+  @Column({ nullable: true })
+  updated_by: number;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  updated_at: Date;
+
   @Column({
     length: 55,
     nullable: false,
@@ -47,6 +67,7 @@ export class InternalDocument {
     (user: User) => user.internal_documents_coordinators,
     {
       onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
   )
   @JoinTable({ name: 'coordinators_internal_documents' })
@@ -54,6 +75,7 @@ export class InternalDocument {
 
   @ManyToMany(() => User, (user: User) => user.internal_documents_executors, {
     onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   @JoinTable({
     name: 'executors_internal_documents',

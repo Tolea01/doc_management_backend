@@ -15,6 +15,26 @@ export class ExitDocument {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  @Column({ nullable: true })
+  created_by: number;
+
+  @Column({ nullable: true })
+  updated_by: number;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  updated_at: Date;
+
   @Column({
     length: 55,
     nullable: false,
@@ -36,12 +56,14 @@ export class ExitDocument {
 
   @ManyToOne(() => Person, (person: Person) => person.received_exit_documents, {
     onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'received_id' })
   received: Person;
 
   @ManyToMany(() => User, (user: User) => user.exit_documents_executors, {
     onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
   })
   @JoinTable({
     name: 'executors_exit_documents',

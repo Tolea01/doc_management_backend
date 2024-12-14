@@ -26,7 +26,10 @@ export class PersonService {
     private readonly personRepository: Repository<Person>,
     private readonly i18n: I18nService,
   ) {}
-  async create(createPersonDto: CreatePersonDto): Promise<PersonResponseDto> {
+  async create(
+    createPersonDto: CreatePersonDto,
+    user: any,
+  ): Promise<PersonResponseDto> {
     try {
       const existPerson: Person | undefined =
         await this.personRepository.findOne({
@@ -41,7 +44,10 @@ export class PersonService {
         );
       }
 
-      return this.personRepository.save(createPersonDto);
+      return this.personRepository.save({
+        created_by: user.userId,
+        ...createPersonDto,
+      });
     } catch (error) {
       throw new InternalServerErrorException(
         await translateMessage(this.i18n, 'error.registration_person_failed', {
@@ -98,11 +104,16 @@ export class PersonService {
   async update(
     id: number,
     updatePersonDto: UpdatePersonDto,
+    user: any,
   ): Promise<UpdatePersonDto> {
     try {
       await this.findOne(id);
 
-      await this.personRepository.update(id, updatePersonDto);
+      await this.personRepository.update(id, {
+        updated_by: user.userId,
+        updated_at: new Date(),
+        ...updatePersonDto,
+      });
 
       return updatePersonDto;
     } catch (error) {

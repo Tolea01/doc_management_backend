@@ -31,6 +31,7 @@ export class InternalDocumentsService {
 
   async create(
     internalDocumentDto: CreateInternalDocumentDto,
+    user: any,
   ): Promise<CreateInternalDocumentDto> {
     try {
       const executors = await this.userService.findByIds(
@@ -67,6 +68,7 @@ export class InternalDocumentsService {
           ...internalDocumentDto,
           executors,
           coordinators,
+          created_by: user.userId,
         });
 
       await this.internalDocumentRepository.save(newDocument);
@@ -211,6 +213,7 @@ export class InternalDocumentsService {
   async update(
     id: number,
     updateInternalDocumentDto: UpdateInternalDocumentDto,
+    user: any,
   ): Promise<UpdateInternalDocumentDto> {
     try {
       const document: InternalDocument | undefined = await this.findOne(id);
@@ -230,7 +233,11 @@ export class InternalDocumentsService {
 
       Object.assign(document, rest);
 
-      await this.internalDocumentRepository.save(document);
+      await this.internalDocumentRepository.save({
+        created_by: user.userId,
+        updated_by: new Date(),
+        ...document,
+      });
 
       return {
         ...rest,

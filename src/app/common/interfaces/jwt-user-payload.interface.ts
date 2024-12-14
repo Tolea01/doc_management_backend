@@ -11,6 +11,14 @@ export interface IJwtUserPayload {
   sub: number;
 }
 
+export interface IJwtUserPayloadProps {
+  id: number;
+  name: string;
+  surname: string;
+  email: string;
+  role: UserRole;
+}
+
 export interface IJwtUserPayloadResponse {
   userId: number;
   userName: string;

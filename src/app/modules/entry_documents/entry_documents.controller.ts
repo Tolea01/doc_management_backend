@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { Role } from 'app/common/decorators/auth/roles.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
+import { Request } from 'express';
 import AppConfig from 'src/config/app.config';
 import paginationConfig from 'src/config/pagination.config';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
@@ -120,8 +122,12 @@ export class EntryDocumentsController {
   @ApiResponse({ status: 500, description: 'Server error' })
   async create(
     @Body() createEntryDocumentDto: CreateEntryDocumentDto,
+    @Req() request: Request,
   ): Promise<CreateEntryDocumentDto> {
-    return this.entryDocumentsService.create(createEntryDocumentDto);
+    return this.entryDocumentsService.create(
+      createEntryDocumentDto,
+      request.user,
+    );
   }
 
   @Get('list')
@@ -206,8 +212,13 @@ export class EntryDocumentsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateEntryDocumentDto: UpdateEntryDocumentDto,
+    @Req() request: Request,
   ) {
-    return this.entryDocumentsService.update(id, updateEntryDocumentDto);
+    return this.entryDocumentsService.update(
+      id,
+      updateEntryDocumentDto,
+      request.user,
+    );
   }
 
   @Delete(':id')

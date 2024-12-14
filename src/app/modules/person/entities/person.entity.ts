@@ -8,6 +8,26 @@ export class Person {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  created_by: number;
+
+  @Column({ nullable: true })
+  updated_by: number;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  created_at: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: (): string => 'CURRENT_TIMESTAMP(6)',
+    precision: 6,
+  })
+  updated_at: Date;
+
   @Column({
     type: 'enum',
     enum: PersonType,

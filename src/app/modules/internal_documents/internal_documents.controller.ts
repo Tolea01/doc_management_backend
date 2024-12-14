@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
@@ -24,6 +25,7 @@ import { Role } from 'app/common/decorators/auth/roles.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
+import { Request } from 'express';
 import AppConfig from 'src/config/app.config';
 import paginationConfig from 'src/config/pagination.config';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
@@ -120,8 +122,12 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 500, description: 'Server error' })
   async create(
     @Body() createInternalDocumentDto: CreateInternalDocumentDto,
+    @Req() request: Request,
   ): Promise<CreateInternalDocumentDto> {
-    return this.internalDocumentsService.create(createInternalDocumentDto);
+    return this.internalDocumentsService.create(
+      createInternalDocumentDto,
+      request.user,
+    );
   }
 
   @Get('list')
@@ -206,8 +212,13 @@ export class InternalDocumentsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateInternalDocumentDto: UpdateInternalDocumentDto,
+    @Req() request: Request,
   ) {
-    return this.internalDocumentsService.update(id, updateInternalDocumentDto);
+    return this.internalDocumentsService.update(
+      id,
+      updateInternalDocumentDto,
+      request.user,
+    );
   }
 
   @Delete(':id')

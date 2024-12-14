@@ -34,6 +34,7 @@ export class ExitDocumentsService {
 
   async create(
     exitDocumentDto: CreateExitDocumentDto,
+    user: any,
   ): Promise<CreateExitDocumentDto> {
     try {
       const { received, ...rest } = exitDocumentDto;
@@ -70,6 +71,7 @@ export class ExitDocumentsService {
         ...rest,
         received: receivedPerson,
         executors,
+        created_by: user.userId,
       });
 
       await this.exitDocumentRepository.save(newDocument);
@@ -178,6 +180,7 @@ export class ExitDocumentsService {
   async update(
     id: number,
     updateExitDocumentDto: UpdateExitDocumentDto,
+    user: any,
   ): Promise<UpdateExitDocumentDto> {
     try {
       const document: ExitDocument | undefined = await this.findOne(id);
@@ -195,7 +198,11 @@ export class ExitDocumentsService {
 
       Object.assign(document, rest);
 
-      await this.exitDocumentRepository.save(document);
+      await this.exitDocumentRepository.save({
+        updated_by: user.userId,
+        updated_at: new Date(),
+        ...document,
+      });
 
       return {
         ...rest,

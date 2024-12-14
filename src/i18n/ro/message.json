@@ -1,4 +1,5 @@
 {
   "UPLOAD_SUCCESS": "Fișierele au fost încărcate cu succes",
-  "DELETE_SUCCESS": "Fișierul a fost șters cu succes"
+  "DELETE_SUCCESS": "Fișierul a fost șters cu succes",
+  "FILE_NOT_FOUND": "Fișierele nu au fost găsite"
 }

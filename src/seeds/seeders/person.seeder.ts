@@ -19,6 +19,7 @@ export class PersonSeeder {
       name: faker.person.fullName(),
       address: faker.location.streetAddress(),
       email_address: faker.internet.email(),
+      created_by: faker.number.int({ min: 1, max: 5 }),
     }));
 
     for (const data of personData) {

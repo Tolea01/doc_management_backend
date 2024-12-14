@@ -1,28 +1,30 @@
 import {
-  Controller,
-  Post,
   Body,
+  Controller,
   HttpCode,
-  Res,
   HttpStatus,
+  Post,
+  Req,
+  Res,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserRegisterPayloadDto } from './dto/user.register.payload.dto';
-import { UserRegisterResponseDto } from './dto/user-register.response.dto';
-import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
-import { Role } from 'app/common/decorators/auth/roles.decorator';
-import { UserRole } from '../user/roles/role.enum';
 import { PublicRoute } from 'app/common/decorators/auth/public-route.decorator';
+import { Role } from 'app/common/decorators/auth/roles.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
+import { Request, Response } from 'express';
+import { UserRole } from '../user/roles/role.enum';
+import { AuthService } from './auth.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { Response } from 'express';
-import { TokenResponseDto } from './dto/tokens.response.dto';
+import { TokensDto } from './dto/tokens.dto';
+import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
+import { UserLoginResponseDto } from './dto/user-login.response.dto';
+import { UserRegisterPayloadDto } from './dto/user-register.payload.dto';
+import { UserRegisterResponseDto } from './dto/user-register.response.dto';
 
 @ApiTags('Authentification')
 @ApiLanguageHeader()
@@ -47,8 +49,9 @@ export class AuthController {
   })
   async registerUser(
     @Body() userData: UserRegisterPayloadDto,
+    @Req() request: Request,
   ): Promise<UserRegisterResponseDto> {
-    return this.authService.registerUser(userData);
+    return this.authService.registerUser(userData, request.user);
   }
 
   @Post('login')
@@ -66,11 +69,18 @@ export class AuthController {
     @Body() userData: UserLoginPayloadDto,
     @Res() res: Response,
   ): Promise<void> {
-    const tokens: TokenResponseDto = await this.authService.login(userData);
+    const loggedUser: UserLoginResponseDto =
+      await this.authService.login(userData);
 
-    await this.authService.setRefreshTokenToCookies(tokens, res);
+    await this.authService.setRefreshTokenToCookies(
+      loggedUser.tokens.refreshToken,
+      res,
+    );
 
-    res.status(HttpStatus.OK).json(tokens);
+    res.status(HttpStatus.OK).json({
+      user: loggedUser.user,
+      accesToken: loggedUser.tokens.accessToken,
+    });
   }
 
   @Post('refresh-tokens')
@@ -89,11 +99,27 @@ export class AuthController {
     @Body() oldRefreshTokenDto: RefreshTokenDto,
     @Res() res: Response,
   ): Promise<void> {
-    const refreshToken: TokenResponseDto =
+    const tokens: TokensDto =
       await this.authService.refreshTokens(oldRefreshTokenDto);
 
-    await this.authService.setRefreshTokenToCookies(refreshToken, res);
+    await this.authService.setRefreshTokenToCookies(tokens.refreshToken, res);
 
-    res.status(HttpStatus.OK).json(refreshToken);
+    res.status(HttpStatus.OK).json({ accessToken: tokens.accessToken });
+  }
+
+  @Post('logout')
+  @Role(UserRole.ALL)
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'logging out',
+  })
+  @ApiResponse({
+    status: 200,
+  })
+  @ApiResponse({ status: 500, description: 'Server error' })
+  logout(@Res() response: Response): boolean {
+    this.authService.removeRefreshTokenToResponse(response);
+
+    return true;
   }
 }

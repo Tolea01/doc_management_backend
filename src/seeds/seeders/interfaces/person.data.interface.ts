@@ -5,4 +5,5 @@ export default interface IPersonData {
   name: string;
   address: string;
   email_address: string;
+  created_by: number;
 }

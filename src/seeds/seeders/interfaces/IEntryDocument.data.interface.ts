@@ -14,4 +14,5 @@ export default interface IEntryDocumentData {
   executors: User[];
   execution_time: string;
   file_path: string;
+  created_by: number;
 }

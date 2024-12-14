@@ -10,5 +10,5 @@ export class RefreshTokenDto {
   })
   @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
   @IsString({ message: i18nValidationMessage('validation.INVALID_STRING') })
-  oldRefreshToken: string;
+  refreshToken: string;
 }

@@ -11,14 +11,23 @@ import { UserItemDto } from '../user/dto/user-item.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
-import { TokenResponseDto } from './dto/tokens.response.dto';
+import { TokensDto } from './dto/tokens.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
+import { UserRegisterPayloadDto } from './dto/user-register.payload.dto';
 import { UserRegisterResponseDto } from './dto/user-register.response.dto';
-import { UserRegisterPayloadDto } from './dto/user.register.payload.dto';
 
 @Injectable()
 export class AuthService {
+  private cookieOptions: IRefreshTokenCookie = {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure:
+      this.configService.get<string>('NODE_ENV', 'development') ===
+      'production',
+    path: '/',
+  };
+
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
@@ -28,8 +37,9 @@ export class AuthService {
 
   async registerUser(
     userData: UserRegisterPayloadDto,
+    user: any,
   ): Promise<UserRegisterResponseDto> {
-    return this.userService.create(userData);
+    return this.userService.create(userData, user);
   }
 
   async login(userData: UserLoginPayloadDto): Promise<UserLoginResponseDto> {
@@ -54,7 +64,10 @@ export class AuthService {
       );
 
       if (verifyUserDataPassword) {
-        return await this.generateTokens(jwtPayload);
+        return {
+          tokens: await this.generateTokens(jwtPayload),
+          user: jwtPayload.props,
+        };
       } else {
         throw new UnauthorizedException(
           await translateMessage(this.i18n, 'error.invalid_credentials'),
@@ -67,68 +80,95 @@ export class AuthService {
     }
   }
 
-  async generateTokens(payload: IJwtUserPayload): Promise<TokenResponseDto> {
-    const accessToken = await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
-      secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
-    });
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
-      secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
-    });
-
-    return { accessToken, refreshToken };
-  }
-
-  async refreshTokens(
-    oldRefreshTokenDto: RefreshTokenDto,
-  ): Promise<TokenResponseDto> {
-    const { oldRefreshToken } = oldRefreshTokenDto;
-    const decodedUser: any = await this.jwtService.verifyAsync(
-      oldRefreshToken,
-      {
+  async generateTokens(payload: IJwtUserPayload): Promise<TokensDto> {
+    try {
+      const accessToken = await this.jwtService.signAsync(payload, {
+        expiresIn: this.configService.get<string>('ACCESS_TOKEN_EXPIRE'),
+        secret: this.configService.get<string>('ACCESS_TOKEN_KEY'),
+      });
+      const refreshToken = await this.jwtService.signAsync(payload, {
+        expiresIn: this.configService.get<string>('REFRESH_TOKEN_EXPIRE'),
         secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
-      },
-    );
+      });
 
-    const user: UserItemDto | undefined = await this.userService.findOne(
-      decodedUser.sub,
-    );
-
-    const { props, sub } = decodedUser;
-    const userPayload = { props, sub };
-
-    if (!user) {
+      return { accessToken, refreshToken };
+    } catch (error) {
       throw new UnauthorizedException(
         await translateMessage(this.i18n, 'error.token_generation_failed'),
       );
     }
+  }
 
-    return await this.generateTokens(userPayload);
+  async refreshTokens(oldRefreshTokenDto: RefreshTokenDto): Promise<TokensDto> {
+    try {
+      const { refreshToken } = oldRefreshTokenDto;
+      const decodedUser: any = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
+      });
+
+      const user: UserItemDto | undefined = await this.userService.findOne(
+        decodedUser.sub,
+      );
+
+      const { props, sub } = decodedUser;
+      const userPayload = { props, sub };
+
+      if (!user) {
+        throw new UnauthorizedException(
+          await translateMessage(this.i18n, 'error.token_generation_failed'),
+        );
+      }
+
+      return await this.generateTokens(userPayload);
+    } catch (error) {
+      throw new UnauthorizedException(
+        await translateMessage(this.i18n, 'error.token_generation_failed'),
+      );
+    }
   }
 
   async setRefreshTokenToCookies(
-    tokens: TokenResponseDto,
+    refreshToken: string,
     response: Response,
   ): Promise<void> {
-    const { exp } = this.jwtService.decode(tokens.refreshToken) as {
-      exp: number;
-    };
+    try {
+      const { exp } = this.jwtService.decode(refreshToken) as {
+        exp: number;
+      };
 
-    const refreshTokenCookieName: string = this.configService.get<string>(
-      'REFRESH_TOKEN_COOKIES',
-    );
+      const refreshTokenCookieName: string = this.configService.get<string>(
+        'REFRESH_TOKEN_COOKIES',
+      );
 
-    const cookieOptions: IRefreshTokenCookie = {
-      httpOnly: true,
-      sameSite: 'lax',
-      expires: new Date(exp * 1000),
-      secure:
-        this.configService.get<string>('NODE_ENV', 'development') ===
-        'production',
-      path: '/',
-    };
+      const cookieOptions: IRefreshTokenCookie = {
+        ...this.cookieOptions,
+        expires: new Date(exp * 1000),
+      };
 
-    response.cookie(refreshTokenCookieName, tokens.refreshToken, cookieOptions);
+      response.cookie(refreshTokenCookieName, refreshToken, cookieOptions);
+    } catch (error) {
+      throw new UnauthorizedException(
+        await translateMessage(this.i18n, 'error.server_error'),
+      );
+    }
+  }
+
+  async removeRefreshTokenToResponse(response: Response): Promise<void> {
+    try {
+      const refreshTokenCookieName: string = this.configService.get<string>(
+        'REFRESH_TOKEN_COOKIES',
+      );
+
+      const cookieOptions: IRefreshTokenCookie = {
+        ...this.cookieOptions,
+        expires: new Date(0),
+      };
+
+      response.cookie(refreshTokenCookieName, '', cookieOptions);
+    } catch (error) {
+      throw new UnauthorizedException(
+        await translateMessage(this.i18n, 'error.server_error', { error }),
+      );
+    }
   }
 }

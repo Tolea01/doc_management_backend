@@ -7,6 +7,8 @@ export class PersonFilterBuilder {
       'name',
       'address',
       'email_address',
+      'created_by',
+      'updated_by',
     ];
 
     for (const filterOption of filterOptions) {

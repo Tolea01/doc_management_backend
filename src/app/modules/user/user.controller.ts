@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -18,10 +19,11 @@ import {
 } from '@nestjs/swagger';
 import { Role } from 'app/common/decorators/auth/roles.decorator';
 import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
+import IPagination from 'app/common/interfaces/pagination.interface';
 import ParamApiOperation from 'common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'common/decorators/swagger/query.api.operation';
 import { SortOrder } from 'database/validators/typeorm.sort.validator';
-import { Pagination } from 'nestjs-typeorm-paginate';
+import { Request } from 'express';
 import paginationConfig from 'src/config/pagination.config';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -51,8 +53,11 @@ export class UserController {
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User already exists' })
   @ApiResponse({ status: 500, description: 'Server error' })
-  async create(@Body() createUserDto: CreateUserDto): Promise<UserItemDto> {
-    return this.userService.create(createUserDto);
+  async create(
+    @Body() createUserDto: CreateUserDto,
+    @Req() request: Request,
+  ): Promise<UserItemDto> {
+    return this.userService.create(createUserDto, request.user);
   }
 
   @Get('list')
@@ -82,7 +87,7 @@ export class UserController {
     @Query('sortColumn', new DefaultValuePipe(paginationConfig.sortColumn))
     sortColumn: UserSort,
     @Query('filter') filter: UserFilterDto,
-  ): Promise<Pagination<UserItemDto>> {
+  ): Promise<IPagination<UserItemDto>> {
     return this.userService.findAll(limit, page, sortOrder, sortColumn, filter);
   }
 
@@ -114,8 +119,9 @@ export class UserController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
+    @Req() request: Request,
   ): Promise<UpdateUserDto> {
-    return this.userService.update(id, updateUserDto);
+    return this.userService.update(id, updateUserDto, request.user);
   }
 
   @Delete(':id')

@@ -9,4 +9,5 @@ export default interface IInternalDocumentData {
   coordinators: User[];
   executors: User[];
   file_path: string;
+  created_by: number;
 }

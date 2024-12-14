@@ -9,6 +9,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -20,6 +21,7 @@ import { Role } from 'app/common/decorators/auth/roles.decorator';
 import { ApiLanguageHeader } from 'app/common/decorators/swagger/language-header';
 import ParamApiOperation from 'app/common/decorators/swagger/param.api.operation';
 import QueryApiOperation from 'app/common/decorators/swagger/query.api.operation';
+import { Request } from 'express';
 import { Pagination } from 'nestjs-typeorm-paginate';
 import paginationConfig from 'src/config/pagination.config';
 import { SortOrder } from 'src/database/validators/typeorm.sort.validator';
@@ -55,8 +57,9 @@ export class PersonController {
   @ApiResponse({ status: 500, description: 'Server error' })
   async create(
     @Body() createPersonDto: CreatePersonDto,
+    @Req() request: Request,
   ): Promise<PersonResponseDto> {
-    return this.personService.create(createPersonDto);
+    return this.personService.create(createPersonDto, request.user);
   }
 
   @Get('list')
@@ -121,8 +124,9 @@ export class PersonController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePersonDto: UpdatePersonDto,
+    @Req() request: Request,
   ): Promise<UpdatePersonDto> {
-    return this.personService.update(id, updatePersonDto);
+    return this.personService.update(id, updatePersonDto, request.user);
   }
 
   @Delete(':id')
