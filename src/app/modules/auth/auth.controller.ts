@@ -85,7 +85,6 @@ export class AuthController {
 
   @Post('refresh-tokens')
   @Role(UserRole.ALL)
-  @HttpCode(200)
   @ApiOperation({
     summary: 'Generate new tokens',
   })
@@ -101,7 +100,6 @@ export class AuthController {
   ): Promise<void> {
     const tokens: TokensDto =
       await this.authService.refreshTokens(oldRefreshTokenDto);
-
     await this.authService.setRefreshTokenToCookies(tokens.refreshToken, res);
 
     res.status(HttpStatus.OK).json({ accessToken: tokens.accessToken });
