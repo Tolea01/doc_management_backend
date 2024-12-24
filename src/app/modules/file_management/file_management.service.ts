@@ -18,9 +18,9 @@ export class FileManagementService {
     private readonly i18n: I18nService,
   ) {}
 
-  getFilePath(filename: string): string | null {
+  getFilePath(filename: string, envDestVarName: string): string | null {
     const uploadPath: string = this.configService.get<string>(
-      'ENTRY_DOCUMENTS_UPLOAD_DEST',
+      `${envDestVarName}`,
     );
     const filePath: string = resolve(process.cwd(), uploadPath, filename);
 
@@ -63,9 +63,15 @@ export class FileManagementService {
     }
   }
 
-  async downloadFile(fileName: string): Promise<StreamableFile> {
+  async downloadFile(
+    fileName: string,
+    envDestVarName: string,
+  ): Promise<StreamableFile> {
     try {
-      const filePath: string | null = this.getFilePath(fileName);
+      const filePath: string | null = this.getFilePath(
+        fileName,
+        envDestVarName,
+      );
 
       if (!filePath) {
         throw new NotFoundException(
@@ -83,9 +89,12 @@ export class FileManagementService {
     }
   }
 
-  async deleteFile(fileName: string) {
+  async deleteFile(fileName: string, envDestVarName: string) {
     try {
-      const filePath: string | null = this.getFilePath(fileName);
+      const filePath: string | null = this.getFilePath(
+        fileName,
+        envDestVarName,
+      );
 
       if (!filePath) {
         throw new NotFoundException(

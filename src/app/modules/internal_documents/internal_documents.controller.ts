@@ -43,6 +43,7 @@ import { InternalDocumentSort } from './validators/internal_document.sort.valida
 @ApiBearerAuth()
 @Controller('internal-documents')
 export class InternalDocumentsController {
+  private ENV_VAR_UPLOAD_DEST = 'INTERNAL_DOCUMENTS_UPLOAD_DEST';
   constructor(
     private readonly internalDocumentsService: InternalDocumentsService,
     private readonly fileManagementService: FileManagementService,
@@ -88,7 +89,10 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async downloadFile(@Param('filename') filename: string) {
-    return this.fileManagementService.downloadFile(filename);
+    return this.fileManagementService.downloadFile(
+      filename,
+      this.ENV_VAR_UPLOAD_DEST,
+    );
   }
 
   @Delete('delete-file/:filename')
@@ -106,7 +110,10 @@ export class InternalDocumentsController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async deleteFile(@Param('filename') filename: string) {
-    return this.fileManagementService.deleteFile(filename);
+    return this.fileManagementService.deleteFile(
+      filename,
+      this.ENV_VAR_UPLOAD_DEST,
+    );
   }
 
   @Post('create')

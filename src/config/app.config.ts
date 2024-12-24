@@ -1,13 +1,13 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 import { ConfigService } from '@nestjs/config';
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import dbConnectionOptions from 'src/database/config/db.connection.config';
 import { JwtModuleOptions } from '@nestjs/jwt';
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { join } from 'path';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import I18nConfig from 'app/common/interfaces/I18nConfig.interface';
-import { diskStorage } from 'multer';
 import { Request } from 'express';
+import { diskStorage } from 'multer';
+import { join } from 'path';
+import dbConnectionOptions from 'src/database/config/db.connection.config';
 
 @Injectable()
 export default class AppConfig {
@@ -55,7 +55,7 @@ export default class AppConfig {
   public getMulterOptions(destination: string) {
     return {
       storage: diskStorage({
-        destination: this.configService.get<string>(`${destination}`),
+        destination: this.configService.get<string>(destination),
         filename: (
           req: Request,
           file: Express.Multer.File,

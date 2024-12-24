@@ -43,6 +43,7 @@ import { ExitDocumentSort } from './validators/exit_document.sort.validator';
 @ApiBearerAuth()
 @Controller('exit-documents')
 export class ExitDocumentsController {
+  private ENV_VAR_UPLOAD_DEST = 'EXIT_DOCUMENTS_UPLOAD_DEST';
   constructor(
     private readonly exitDocumentsService: ExitDocumentsService,
     private readonly fileManagementService: FileManagementService,
@@ -88,7 +89,10 @@ export class ExitDocumentsController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async downloadFile(@Param('filename') filename: string) {
-    return this.fileManagementService.downloadFile(filename);
+    return this.fileManagementService.downloadFile(
+      filename,
+      this.ENV_VAR_UPLOAD_DEST,
+    );
   }
 
   @Delete('delete-file/:filename')
@@ -106,7 +110,10 @@ export class ExitDocumentsController {
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({ status: 500, description: 'Server error' })
   async deleteFile(@Param('filename') filename: string) {
-    return this.fileManagementService.deleteFile(filename);
+    return this.fileManagementService.deleteFile(
+      filename,
+      this.ENV_VAR_UPLOAD_DEST,
+    );
   }
 
   @Post('create')
