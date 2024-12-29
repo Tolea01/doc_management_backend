@@ -19,7 +19,12 @@ export default class AppConfig {
     return {
       origin: [this.configService.get<string>('CORS_ALLOWED_ORIGINS')],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'Accept-language',
+        'language',
+      ],
       credentials: true,
     };
   }

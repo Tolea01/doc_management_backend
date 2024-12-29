@@ -79,7 +79,7 @@ export class AuthController {
 
     res.status(HttpStatus.OK).json({
       user: loggedUser.user,
-      accesToken: loggedUser.tokens.accessToken,
+      accessToken: loggedUser.tokens.accessToken,
     });
   }
 
