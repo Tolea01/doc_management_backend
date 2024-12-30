@@ -90,7 +90,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @ApiResponse({ status: 401 })
   @ApiResponse({ status: 500 })
-  async getProfile(@Req() req: Request) {
+  async getUserInfo(@Req() req: Request) {
     return req.user;
   }
 
