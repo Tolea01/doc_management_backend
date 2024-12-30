@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -81,6 +82,16 @@ export class AuthController {
       user: loggedUser.user,
       accessToken: loggedUser.tokens.accessToken,
     });
+  }
+
+  @Get('me')
+  @Role(UserRole.ALL)
+  @HttpCode(200)
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 401 })
+  @ApiResponse({ status: 500 })
+  async getProfile(@Req() req: Request) {
+    return req.user;
   }
 
   @Post('refresh-tokens')
