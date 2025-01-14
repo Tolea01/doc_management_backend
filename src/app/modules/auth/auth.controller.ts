@@ -20,7 +20,6 @@ import ApiLanguageHeader from 'app/common/decorators/swagger/language-header';
 import { Request, Response } from 'express';
 import { UserRole } from '../user/roles/role.enum';
 import { AuthService } from './auth.service';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
@@ -95,7 +94,7 @@ export class AuthController {
   }
 
   @Post('refresh-tokens')
-  @Role(UserRole.ALL)
+  @PublicRoute()
   @ApiOperation({
     summary: 'Generate new tokens',
   })
@@ -106,11 +105,10 @@ export class AuthController {
   @ApiResponse({ status: 500, description: 'Server error' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async refreshTokens(
-    @Body() oldRefreshTokenDto: RefreshTokenDto,
     @Res() res: Response,
+    @Req() req: Request,
   ): Promise<void> {
-    const tokens: TokensDto =
-      await this.authService.refreshTokens(oldRefreshTokenDto);
+    const tokens: TokensDto = await this.authService.refreshTokens(req);
     await this.authService.setRefreshTokenToCookies(tokens.refreshToken, res);
 
     res.status(HttpStatus.OK).json({ accessToken: tokens.accessToken });
@@ -118,7 +116,6 @@ export class AuthController {
 
   @Post('logout')
   @Role(UserRole.ALL)
-  @HttpCode(200)
   @ApiOperation({
     summary: 'logging out',
   })
@@ -126,9 +123,9 @@ export class AuthController {
     status: 200,
   })
   @ApiResponse({ status: 500, description: 'Server error' })
-  logout(@Res() response: Response): boolean {
+  logout(@Res() response: Response): void {
     this.authService.removeRefreshTokenToResponse(response);
 
-    return true;
+    response.status(200).send({ message: 'Logout successful' });
   }
 }

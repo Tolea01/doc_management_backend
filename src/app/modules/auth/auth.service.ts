@@ -5,12 +5,11 @@ import { IJwtUserPayload } from 'app/common/interfaces/jwt-user-payload.interfac
 import { IRefreshTokenCookie } from 'app/common/interfaces/refresh-token-cookie.interface';
 import { translateMessage } from 'app/utils/translateMessage';
 import { verify } from 'argon2';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { I18nService } from 'nestjs-i18n';
 import { UserItemDto } from '../user/dto/user-item.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokensDto } from './dto/tokens.dto';
 import { UserLoginPayloadDto } from './dto/user-login.payload.dto';
 import { UserLoginResponseDto } from './dto/user-login.response.dto';
@@ -21,6 +20,7 @@ import { UserRegisterResponseDto } from './dto/user-register.response.dto';
 export class AuthService {
   private cookieOptions: IRefreshTokenCookie = {
     httpOnly: true,
+    domain: this.configService.get<string>('DOMAIN', 'localhost'),
     sameSite: 'lax',
     secure:
       this.configService.get<string>('NODE_ENV', 'development') ===
@@ -99,9 +99,12 @@ export class AuthService {
     }
   }
 
-  async refreshTokens(oldRefreshTokenDto: RefreshTokenDto): Promise<TokensDto> {
+  async refreshTokens(req: Request): Promise<TokensDto> {
     try {
-      const { refreshToken } = oldRefreshTokenDto;
+      const refreshTokenCookieName = this.configService.get<string>(
+        'REFRESH_TOKEN_COOKIES',
+      );
+      const refreshToken = req.cookies[refreshTokenCookieName];
       const decodedUser: any = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.configService.get<string>('REFRESH_TOKEN_KEY'),
       });
