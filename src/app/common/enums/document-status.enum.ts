@@ -1,6 +1,6 @@
 export enum DocumentStatus {
-  IN_WORK = 'InWork',
-  EXPIRED = 'expired',
-  EXPIRING = 'expiring',
-  FINISHED = 'finished',
+  IN_WORK = 'în lucru',
+  EXPIRED = 'expirat',
+  EXPIRING = 'expiră',
+  FINISHED = 'finisat',
 }
