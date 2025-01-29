@@ -8,6 +8,7 @@ export class InternalDocumentFilterBuilder {
       'execution_time',
       'created_by',
       'updated_by',
+      'status',
     ];
 
     for (const filterOption of filterOptions) {
