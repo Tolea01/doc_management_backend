@@ -48,8 +48,8 @@ export class ExitDocument {
   @Column({ type: 'text', nullable: true })
   comment?: string;
 
-  @Column({ type: 'date' })
-  execution_time: string;
+  // @Column({ type: 'date' })
+  // execution_time: string;
 
   @Column({ type: 'text' })
   file_path: string;

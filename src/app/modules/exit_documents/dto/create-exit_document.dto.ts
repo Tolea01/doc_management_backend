@@ -56,15 +56,15 @@ export class CreateExitDocumentDto {
   )
   executors: number[];
 
-  @ApiProperty({
-    example: '2024-08-19',
-    description: 'Execution time',
-  })
-  @IsISO8601(
-    {},
-    { message: i18nValidationMessage('validation.INVALID_DATE_STRING') },
-  )
-  execution_time: string;
+  // @ApiProperty({
+  //   example: '2024-08-19',
+  //   description: 'Execution time',
+  // })
+  // @IsISO8601(
+  //   {},
+  //   { message: i18nValidationMessage('validation.INVALID_DATE_STRING') },
+  // )
+  // execution_time: string;
 
   @ApiProperty({
     example: '/random-document.pdf',
