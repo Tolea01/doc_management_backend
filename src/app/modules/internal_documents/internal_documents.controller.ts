@@ -191,7 +191,7 @@ export class InternalDocumentsController {
   }
 
   @Get('coordinator/:id')
-  @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY, UserRole.HEAD_OF_DIRECTION)
   @ApiOperation({ summary: 'Get document by coordinator' })
   @ApiResponse({ status: 200, description: 'Coordinator has been found' })
   @ApiResponse({ status: 404, description: 'Coordinator not found' })

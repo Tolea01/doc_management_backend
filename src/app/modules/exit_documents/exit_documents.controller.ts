@@ -180,7 +180,7 @@ export class ExitDocumentsController {
   }
 
   @Get('executor/:id')
-  @Role(UserRole.DIRECTOR, UserRole.SECRETARY)
+  @Role(UserRole.DIRECTOR, UserRole.SECRETARY, UserRole.HEAD_OF_DIRECTION)
   @ApiOperation({ summary: 'Get document by executor' })
   @ApiResponse({ status: 200, description: 'Executor has been found' })
   @ApiResponse({ status: 404, description: 'Executor not found' })
