@@ -12,10 +12,12 @@ import {
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import AllModules from './modules';
+import { ChatModule } from './modules/chat/chat.module';
 
 @Module({
   imports: [
     ...AllModules,
+    ChatModule,
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       useFactory: () => new AppConfig().databaseConnection(),
