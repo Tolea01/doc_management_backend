@@ -5,6 +5,16 @@ const buildApiDocs = <T>(app: T): void => {
     .setTitle(process.env.APP_TITLE)
     .setVersion(process.env.APP_VERSION)
     .addTag(process.env.APP_TAG)
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const swaggerDocument: OpenAPIObject = SwaggerModule.createDocument(
     app as any,

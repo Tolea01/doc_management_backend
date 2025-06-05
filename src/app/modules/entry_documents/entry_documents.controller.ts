@@ -40,7 +40,7 @@ import { EntryDocumentSort } from './validators/entry_document.sort.validator';
 
 @ApiTags('Entry Documents')
 @ApiLanguageHeader()
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 @Controller('entry-documents')
 export class EntryDocumentsController {
   private ENV_VAR_UPLOAD_DEST = 'ENTRY_DOCUMENTS_UPLOAD_DEST';
